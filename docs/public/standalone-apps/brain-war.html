@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perang Otak 2025 - Single Player</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1e293b; /* bg-slate-800 */
+            color: #e2e8f0; /* text-slate-200 */
+        }
+        .answer-btn.correct { background-color: #22c55e !important; border-color: #16a34a !important; transform: scale(1.05); color: white; }
+        .answer-btn.incorrect { background-color: #ef4444 !important; border-color: #dc2626 !important; opacity: 0.7; }
+        .answer-btn.disabled { pointer-events: none; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        .animate-fadeIn { animation: fadeIn 0.5s ease-out forwards; }
+        @keyframes countdown { from { width: 100%; } to { width: 0%; } }
+        .timer-bar-animation { animation: countdown 10s linear forwards; }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+
+    <div id="game-container" class="w-full max-w-lg mx-auto">
+
+        <!-- Start Screen -->
+        <div id="start-screen" class="text-center p-8 bg-slate-700 rounded-2xl shadow-2xl animate-fadeIn">
+            <h1 class="text-5xl font-extrabold mb-2">Perang Otak</h1>
+            <p class="text-2xl font-bold text-amber-400 mb-8">Edisi 2025</p>
+            <p class="text-slate-300 mb-6">Uji pengetahuanmu dengan 10 pertanyaan dari bank soal 100 pertanyaan. Siap?</p>
+            <button id="start-button" class="w-full bg-amber-500 text-slate-900 font-bold py-4 px-6 rounded-lg text-xl hover:bg-amber-400 transition-transform transform hover:scale-105 mb-4">
+                MULAI MAIN
+            </button>
+            <button id="leaderboard-button" class="w-full bg-slate-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-slate-500 transition">
+                Lihat Papan Skor
+            </button>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="quiz-screen" class="hidden bg-slate-700 rounded-2xl shadow-2xl overflow-hidden">
+             <header class="p-4 bg-slate-900/50 flex justify-between items-center">
+                <div><span class="font-bold">Skor: <span id="score">0</span></span></div>
+                <div class="font-semibold text-slate-400">Pertanyaan <span id="question-counter">1</span> / <span id="total-questions">10</span></div>
+            </header>
+            <main class="p-6">
+                <div class="text-center mb-4"><p id="category-name" class="text-sm text-slate-400 font-medium">Kategori</p></div>
+                <div class="w-full bg-slate-600 rounded-full h-2.5 mb-6 overflow-hidden"><div id="timer-bar" class="bg-amber-400 h-2.5 rounded-full"></div></div>
+                <div class="bg-slate-800 p-6 rounded-xl min-h-[120px] flex items-center justify-center text-center mb-6"><h3 id="question-text" class="text-xl font-semibold leading-relaxed"></h3></div>
+                <div id="answer-options" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+            </main>
+        </div>
+        
+        <!-- End Screen -->
+        <div id="end-screen" class="hidden text-center p-8 bg-slate-700 rounded-2xl shadow-2xl">
+            <h1 class="text-4xl font-extrabold mb-4">Permainan Selesai!</h1>
+            <p class="text-xl text-slate-300 mb-2">Skor Akhir Kamu:</p>
+            <p id="final-score" class="text-7xl font-black text-amber-400 mb-6">0</p>
+            <div class="w-full max-w-sm mx-auto">
+                <label for="player-name" class="block text-sm font-medium text-slate-300 mb-2">Simpan skormu ke Papan Skor:</label>
+                <div class="flex gap-2">
+                    <input type="text" id="player-name" placeholder="Masukkan namamu..." class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:ring-2 focus:ring-amber-400 focus:border-amber-400 transition">
+                    <button id="save-score-button" class="bg-green-600 text-white font-bold py-3 px-5 rounded-lg hover:bg-green-500 transition">Simpan</button>
+                </div>
+            </div>
+            <button id="restart-button" class="w-full mt-6 bg-amber-500 text-slate-900 font-bold py-4 px-6 rounded-lg text-xl hover:bg-amber-400 transition-transform transform hover:scale-105">
+                MAIN LAGI
+            </button>
+        </div>
+        
+        <!-- Leaderboard Screen -->
+        <div id="leaderboard-screen" class="hidden p-8 bg-slate-700 rounded-2xl shadow-2xl">
+            <h1 class="text-4xl font-extrabold mb-6 text-center text-amber-400">Papan Skor</h1>
+            <ul id="leaderboard-list" class="space-y-3 mb-6 max-h-96 overflow-y-auto">
+                <!-- Leaderboard items will be generated here -->
+            </ul>
+            <button id="back-to-menu-button" class="w-full bg-slate-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-slate-500 transition">
+                Kembali ke Menu
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        // --- Bank Soal (100 Pertanyaan) ---
+        const questions = [
+            // ... (100 pertanyaan tetap sama, tidak perlu disalin ulang di sini untuk keringkasan)
+            { category: "Geografi", question: "Apa nama ibukota dari negara Turki?", options: ["Istanbul", "Ankara", "Izmir", "Antalya"], answer: "Ankara" }, { category: "Geografi", question: "Sungai terpanjang di dunia adalah...", options: ["Amazon", "Nil", "Yangtze", "Mississippi"], answer: "Nil" }, { category: "Geografi", question: "Gunung tertinggi di dunia adalah...", options: ["K2", "Kangchenjunga", "Lhotse", "Everest"], answer: "Everest" }, { category: "Geografi", question: "Benua terluas di dunia adalah...", options: ["Afrika", "Eropa", "Amerika Utara", "Asia"], answer: "Asia" }, { category: "Geografi", question: "Samudra terbesar di dunia adalah...", options: ["Atlantik", "Pasifik", "Hindia", "Arktik"], answer: "Pasifik" }, { category: "Geografi", question: "Negara dengan populasi terbanyak di dunia (per 2024) adalah...", options: ["China", "Amerika Serikat", "India", "Indonesia"], answer: "India" }, { category: "Geografi", question: "Gurun pasir non-polar terbesar di dunia adalah...", options: ["Gobi", "Kalahari", "Sahara", "Arab"], answer: "Sahara" }, { category: "Geografi", question: "Ibukota negara Jepang adalah...", options: ["Kyoto", "Osaka", "Tokyo", "Hiroshima"], answer: "Tokyo" }, { category: "Geografi", question: "Negara mana yang terkenal dengan kota Venesia?", options: ["Yunani", "Spanyol", "Italia", "Prancis"], answer: "Italia" }, { category: "Geografi", question: "Selat yang memisahkan benua Asia dan Amerika adalah...", options: ["Selat Malaka", "Selat Gibraltar", "Selat Bering", "Selat Sunda"], answer: "Selat Bering" }, { category: "Sains", question: "Planet manakah yang dikenal sebagai 'Planet Merah'?", options: ["Venus", "Jupiter", "Mars", "Saturnus"], answer: "Mars" }, { category: "Sains", question: "Apa unsur kimia dengan simbol 'O'?", options: ["Osmium", "Emas", "Oksigen", "Oganesson"], answer: "Oksigen" }, { category: "Sains", question: "Siapa yang mengembangkan teori relativitas?", options: ["Isaac Newton", "Galileo Galilei", "Albert Einstein", "Stephen Hawking"], answer: "Albert Einstein" }, { category: "Sains", question: "Apa nama gaya yang menarik benda ke pusat bumi?", options: ["Sentrifugal", "Elektromagnetik", "Nuklir", "Gravitasi"], answer: "Gravitasi" }, { category: "Sains", question: "Berapa jumlah planet dalam Tata Surya kita?", options: ["7", "8", "9", "10"], answer: "8" }, { category: "Sains", question: "Proses tumbuhan membuat makanan dengan sinar matahari disebut...", options: ["Respirasi", "Transpirasi", "Fotosintesis", "Evolusi"], answer: "Fotosintesis" }, { category: "Sains", question: "Unsur paling melimpah di alam semesta adalah...", options: ["Oksigen", "Karbon", "Helium", "Hidrogen"], answer: "Hidrogen" }, { category: "Sains", question: "Apa satuan dasar dari kehidupan?", options: ["Atom", "Molekul", "Sel", "Organ"], answer: "Sel" }, { category: "Sains", question: "Siapa penemu penisilin?", options: ["Marie Curie", "Louis Pasteur", "Alexander Fleming", "Jonas Salk"], answer: "Alexander Fleming" }, { category: "Sains", question: "Berapa kecepatan cahaya di ruang hampa?", options: ["150.000 km/detik", "300.000 km/detik", "500.000 km/detik", "1.000.000 km/detik"], answer: "300.000 km/detik" }, { category: "Sejarah", question: "Pada tahun berapa Perang Dunia II berakhir?", options: ["1942", "1945", "1948", "1950"], answer: "1945" }, { category: "Sejarah", question: "Siapa kaisar pertama Kekaisaran Romawi?", options: ["Julius Caesar", "Nero", "Augustus", "Constantine"], answer: "Augustus" }, { category: "Sejarah", question: "Peradaban kuno mana yang membangun Piramida Giza?", options: ["Romawi", "Yunani", "Mesopotamia", "Mesir Kuno"], answer: "Mesir Kuno" }, { category: "Sejarah", question: "Kapan Indonesia memproklamasikan kemerdekaannya?", options: ["17 Agustus 1945", "28 Oktober 1928", "1 Juni 1945", "10 November 1945"], answer: "17 Agustus 1945" }, { category: "Sejarah", question: "Siapa yang memimpin Revolusi Rusia pada tahun 1917?", options: ["Joseph Stalin", "Leon Trotsky", "Vladimir Lenin", "Mikhail Gorbachev"], answer: "Vladimir Lenin" }, { category: "Sejarah", question: "Peristiwa apa yang memicu Perang Dunia I?", options: ["Invasi Polandia", "Pembunuhan Archduke Franz Ferdinand", "Serangan Pearl Harbor", "Revolusi Bolshevik"], answer: "Pembunuhan Archduke Franz Ferdinand" }, { category: "Sejarah", question: "Siapa manusia pertama yang berjalan di bulan?", options: ["Buzz Aldrin", "Yuri Gagarin", "Michael Collins", "Neil Armstrong"], answer: "Neil Armstrong" }, { category: "Sejarah", question: "Di negara mana Tembok Berlin pernah berdiri?", options: ["Polandia", "Austria", "Hungaria", "Jerman"], answer: "Jerman" }, { category: "Sejarah", question: "Apa nama kapal utama Christopher Columbus?", options: ["Mayflower", "Discovery", "Santa Maria", "Endeavour"], answer: "Santa Maria" }, { category: "Sejarah", question: "Siapa presiden Amerika Serikat selama Perang Saudara?", options: ["Thomas Jefferson", "Andrew Jackson", "Abraham Lincoln", "Ulysses S. Grant"], answer: "Abraham Lincoln" }, { category: "Teknologi", question: "Siapakah pendiri dari perusahaan Microsoft?", options: ["Steve Jobs", "Jeff Bezos", "Elon Musk", "Bill Gates"], answer: "Bill Gates" }, { category: "Teknologi", question: "Apa kepanjangan dari 'CPU'?", options: ["Computer Processing Unit", "Central Processing Unit", "Central Power Unit", "Computer Power Unit"], answer: "Central Processing Unit" }, { category: "Teknologi", question: "Siapa yang dianggap sebagai 'Bapak Komputer'?", options: ["Alan Turing", "Charles Babbage", "John von Neumann", "Tim Berners-Lee"], answer: "Charles Babbage" }, { category: "Teknologi", question: "Apa nama jaringan global yang menghubungkan komputer di seluruh dunia?", options: ["Intranet", "Extranet", "World Wide Web", "Internet"], answer: "Internet" }, { category: "Teknologi", question: "Perusahaan teknologi mana yang membuat iPhone?", options: ["Samsung", "Google", "Apple", "Huawei"], answer: "Apple" }, { category: "Teknologi", question: "Apa kepanjangan dari 'URL'?", options: ["Universal Reference Link", "Uniform Resource Locator", "Universal Resource Locator", "Uniform Reference Link"], answer: "Uniform Resource Locator" }, { category: "Teknologi", question: "Sistem operasi mobile mana yang dikembangkan oleh Google?", options: ["iOS", "Windows Phone", "Android", "Symbian"], answer: "Android" }, { category: "Teknologi", question: "Apa nama platform media sosial yang awalnya bernama 'Thefacebook'?", options: ["Twitter", "Instagram", "Facebook", "MySpace"], answer: "Facebook" }, { category: "Teknologi", question: "Teknologi apa yang digunakan untuk pembayaran nirkontak dengan ponsel?", options: ["Bluetooth", "Wi-Fi", "NFC", "Inframerah"], answer: "NFC" }, { category: "Teknologi", question: "Apa nama asisten virtual yang dikembangkan oleh Amazon?", options: ["Siri", "Google Assistant", "Cortana", "Alexa"], answer: "Alexa" }, { category: "Film", question: "Siapa sutradara dari film 'Parasite' yang memenangkan Oscar?", options: ["Bong Joon-ho", "Park Chan-wook", "Kim Ki-duk", "Lee Chang-dong"], answer: "Bong Joon-ho" }, { category: "Film", question: "Film mana yang memiliki kutipan terkenal 'May the Force be with you'?", options: ["Star Trek", "Star Wars", "The Lord of the Rings", "Harry Potter"], answer: "Star Wars" }, { category: "Film", question: "Siapa yang memerankan karakter Iron Man di Marvel Cinematic Universe?", options: ["Chris Evans", "Chris Hemsworth", "Mark Ruffalo", "Robert Downey Jr."], answer: "Robert Downey Jr." }, { category: "Film", question: "Film animasi pertama dari Pixar adalah...", options: ["Finding Nemo", "Monsters, Inc.", "Toy Story", "A Bug's Life"], answer: "Toy Story" }, { category: "Film", question: "Siapa sutradara film 'The Dark Knight'?", options: ["James Cameron", "Steven Spielberg", "Christopher Nolan", "Martin Scorsese"], answer: "Christopher Nolan" }, { category: "Film", question: "Karakter fiksi mana yang tinggal di 221B Baker Street?", options: ["Hercule Poirot", "James Bond", "Sherlock Holmes", "Dr. Watson"], answer: "Sherlock Holmes" }, { category: "Film", question: "Siapa yang memerankan karakter Katniss Everdeen dalam 'The Hunger Games'?", options: ["Emma Watson", "Shailene Woodley", "Jennifer Lawrence", "Kristen Stewart"], answer: "Jennifer Lawrence" }, { category:- "Film", question: "Apa nama dunia sihir tempat Harry Potter bersekolah?", options: ["Narnia", "Middle-earth", "Westeros", "Hogwarts"], answer: "Hogwarts" }, { category: "Film", question: "Film mana yang menampilkan kapal bernama Titanic?", options: ["Poseidon", "The Perfect Storm", "Titanic", "Waterworld"], answer: "Titanic" }, { category: "Film", question: "Siapa yang memerankan Jack Dawson di film Titanic?", options: ["Tom Cruise", "Brad Pitt", "Johnny Depp", "Leonardo DiCaprio"], answer: "Leonardo DiCaprio" }, { category: "Umum", question: "Berapa jumlah sisi pada sebuah hexagon (segi enam)?", options: ["5", "6", "7", "8"], answer: "6" }, { category: "Umum", question: "Berapa banyak warna dalam pelangi?", options: ["Lima", "Enam", "Tujuh", "Delapan"], answer: "Tujuh" }, { category: "Umum", question: "Apa nama mata uang Jepang?", options: ["Won", "Yuan", "Yen", "Ringgit"], answer: "Yen" }, { category: "Umum", question: "Berapa jumlah hari dalam setahun kabisat?", options: ["364", "365", "366", "367"], answer: "366" }, { category: "Umum", question: "Apa nama ibu kota Prancis?", options: ["Roma", "Berlin", "Madrid", "Paris"], answer: "Paris" }, { category: "Umum", question: "Berapa jumlah pemain dalam satu tim sepak bola?", options: ["9", "10", "11", "12"], answer: "11" }, { category: "Umum", question: "Apa nama samudera terkecil di dunia?", options: ["Hindia", "Atlantik", "Arktik", "Pasifik"], answer: "Arktik" }, { category: "Umum", question: "Apa nama instrumen musik dengan 88 tuts?", options: ["Organ", "Harpsichord", "Piano", "Keyboard"], answer: "Piano" }, { category: "Umum", question: "Apa nama benua yang sepenuhnya tertutup es?", options: ["Asia", "Amerika Utara", "Australia", "Antartika"], answer: "Antartika" }, { category: "Umum", question: "Apa singkatan dari 'WHO' dalam konteks kesehatan dunia?", options: ["World Health Organization", "World Human Organization", "World Help Organization", "World Habitat Organization"], answer: "World Health Organization" }, { category: "Olahraga", question: "Negara manakah yang memenangkan Piala Dunia FIFA pertama pada tahun 1930?", options: ["Brazil", "Argentina", "Italia", "Uruguay"], answer: "Uruguay" }, { category: "Olahraga", question: "Di negara mana Olimpiade modern pertama kali diadakan?", options: ["Prancis", "Inggris", "Yunani", "Amerika Serikat"], answer: "Yunani" }, { category: "Olahraga", question: "Siapa petinju yang dikenal dengan julukan 'The Greatest'?", options: ["Mike Tyson", "Floyd Mayweather", "Muhammad Ali", "Manny Pacquiao"], answer: "Muhammad Ali" }, { category: "Olahraga", question: "Berapa jumlah ring dalam logo Olimpiade?", options: ["Empat", "Lima", "Enam", "Tujuh"], answer: "Lima" }, { category: "Olahraga", question: "Apa nama turnamen tenis Grand Slam yang diadakan di London?", options: ["US Open", "French Open", "Australian Open", "Wimbledon"], answer: "Wimbledon" }, { category: "Olahraga", question: "Siapa pemain bola basket yang dijuluki 'Air Jordan'?", options: ["LeBron James", "Kobe Bryant", "Michael Jordan", "Shaquille O'Neal"], answer: "Michael Jordan" }, { category: "Olahraga", question: "Berapa jarak lari maraton penuh?", options: ["21.097 km", "30 km", "42.195 km", "50 km"], answer: "42.195 km" }, { category: "Olahraga", question: "Olahraga apa yang menggunakan 'shuttlecock'?", options: ["Tenis", "Squash", "Bulu Tangkis", "Ping Pong"], answer: "Bulu Tangkis" }, { category: "Olahraga", question: "Tim mana yang paling banyak memenangkan gelar NBA?", options: ["Chicago Bulls", "Golden State Warriors", "Boston Celtics", "San Antonio Spurs"], answer: "Boston Celtics" }, { category: "Olahraga", question: "Siapa pembalap Formula 1 dengan gelar juara dunia terbanyak?", options: ["Ayrton Senna", "Sebastian Vettel", "Lewis Hamilton", "Juan Manuel Fangio"], answer: "Lewis Hamilton" }, { category: "Seni", question: "Siapakah pelukis dari karya terkenal 'Mona Lisa'?", options: ["Vincent van Gogh", "Pablo Picasso", "Leonardo da Vinci", "Michelangelo"], answer: "Leonardo da Vinci" }, { category: "Seni", question: "Siapa yang memahat patung 'David'?", options: ["Donatello", "Raphael", "Michelangelo", "Bernini"], answer: "Michelangelo" }, { category: "Seni", question: "Aliran seni apa yang dipopulerkan oleh Andy Warhol?", options: ["Surealisme", "Kubisme", "Impresionisme", "Pop Art"], answer: "Pop Art" }, { category: "Seni", question: "Di museum mana lukisan 'Mona Lisa' dipajang?", options: ["Prado", "Uffizi", "Metropolitan Museum of Art", "Louvre"], answer: "Louvre" }, { category: "Seni", question: "Siapa pelukis 'The Starry Night'?", options: ["Claude Monet", "Edvard Munch", "Vincent van Gogh", "Paul Cézanne"], answer: "Vincent van Gogh" }, { category: "Seni", question: "Apa nama lain dari seni melipat kertas dari Jepang?", options: ["Ikebana", "Kirigami", "Origami", "Sumi-e"], answer: "Origami" }, { category: "Seni", question: "Aliran seni apa yang terkenal dengan penggunaan bentuk geometris?", options: ["Futurisme", "Kubisme", "Dadaisme", "Abstraksionisme"], answer: "Kubisme" }, { category: "Seni", question: "Siapa pelukis 'The Persistence of Memory' yang terkenal dengan jam meleleh?", options: ["René Magritte", "Max Ernst", "Salvador Dalí", "Joan Miró"], answer: "Salvador Dalí" }, { category: "Seni", question: "Apa nama teknik melukis di dinding atau langit-langit yang basah plester?", options: ["Mosaik", "Tempera", "Fresco", "Encaustic"], answer: "Fresco" }, { category: "Seni", question: "Siapa arsitek yang merancang Gedung Opera Sydney?", options: ["Frank Lloyd Wright", "Le Corbusier", "Zaha Hadid", "Jørn Utzon"], answer: "Jørn Utzon" }, { category: "Musik", question: "Siapa vokalis utama dari band legendaris 'Queen'?", options: ["Freddie Mercury", "John Lennon", "Mick Jagger", "Robert Plant"], answer: "Freddie Mercury" }, { category: "Musik", question: "Siapa yang dikenal sebagai 'King of Pop'?", options: ["Elvis Presley", "Michael Jackson", "Prince", "James Brown"], answer: "Michael Jackson" }, { category: "Musik", question: "Grup musik mana yang berasal dari Liverpool dan dikenal sebagai 'The Fab Four'?", options: ["The Rolling Stones", "The Who", "The Beatles", "Led Zeppelin"], answer: "The Beatles" }, { category: "Musik", question: "Berapa jumlah senar pada biola standar?", options: ["Tiga", "Empat", "Lima", "Enam"], answer: "Empat" }, { category: "Musik", question: "Siapa komposer dari 'Für Elise'?", options: ["Mozart", "Bach", "Beethoven", "Chopin"], answer: "Beethoven" }, { category: "Musik", question: "Siapa penyanyi yang dijuluki 'Queen of Soul'?", options: ["Diana Ross", "Whitney Houston", "Aretha Franklin", "Tina Turner"], answer: "Aretha Franklin" }, { category: "Musik", question: "Apa nama festival musik besar yang diadakan di Woodstock pada tahun 1969?", options: ["Glastonbury", "Coachella", "Woodstock", "Lollapalooza"], answer: "Woodstock" }, { category: "Musik", question: "Grup rock mana yang merilis album 'The Dark Side of the Moon'?", options: ["Led Zeppelin", "The Doors", "Pink Floyd", "Deep Purple"], answer: "Pink Floyd" }, { category: "Musik", "question": "Siapa penyanyi utama dari band Nirvana?", "options": ["Dave Grohl", "Eddie Vedder", "Chris Cornell", "Kurt Cobain"], "answer": "Kurt Cobain" }, { category: "Musik", question: "Alat musik apa yang sering menjadi pusat dalam orkestra simfoni?", options: ["Gitar", "Piano", "Biola", "Drum"], answer: "Biola" }, { category: "Sastra", question: "Siapakah penulis dari novel 'Laskar Pelangi'?", options: ["Pramoedya Ananta Toer", "Tere Liye", "Dewi Lestari", "Andrea Hirata"], answer: "Andrea Hirata" }, { category: "Sastra", question: "Siapa penulis drama 'Romeo and Juliet'?", options: ["Charles Dickens", "George Orwell", "William Shakespeare", "Jane Austen"], answer: "William Shakespeare" }, { category: "Sastra", question: "Dalam seri 'The Lord of the Rings', siapa yang bertugas menghancurkan Cincin?", options: ["Gandalf", "Aragorn", "Frodo Baggins", "Samwise Gamgee"], answer: "Frodo Baggins" }, { category: "Sastra", question: "Siapa penulis seri novel 'Harry Potter'?", options: ["J.R.R. Tolkien", "C.S. Lewis", "J.K. Rowling", "George R.R. Martin"], answer: "J.K. Rowling" }, { category: "Sastra", question: "Apa nama kapten kapal Pequod dalam novel 'Moby Dick'?", options: ["Kapten Nemo", "Kapten Hook", "Kapten Ahab", "Kapten Flint"], answer: "Kapten Ahab" }, { category: "Sastra", question: "Siapa penulis 'To Kill a Mockingbird'?", options: ["F. Scott Fitzgerald", "John Steinbeck", "Harper Lee", "Ernest Hemingway"], answer: "Harper Lee" }, { category: "Sastra", question: "Genre sastra apa yang menceritakan kisah-kisah detektif dan misteri?", options: ["Fiksi Ilmiah", "Fantasi", "Fiksi Detektif", "Horor"], answer: "Fiksi Detektif" }, { category: "Sastra", question: "Siapa penulis 'The Great Gatsby'?", options: ["William Faulkner", "F. Scott Fitzgerald", "Mark Twain", "Herman Melville"], answer: "F. Scott Fitzgerald" }, { category: "Sastra", question: "Apa nama pena dari Samuel Langhorne Clemens?", options: ["George Orwell", "Lewis Carroll", "Mark Twain", "O. Henry"], answer: "Mark Twain" }, { category: "Sastra", question: "Dalam mitologi Yunani, siapa pahlawan yang membunuh Medusa?", options: ["Hercules", "Theseus", "Perseus", "Achilles"], answer: "Perseus" }
+        ];
+
+        // --- DOM Elements ---
+        const startScreen = document.getElementById('start-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const endScreen = document.getElementById('end-screen');
+        const leaderboardScreen = document.getElementById('leaderboard-screen');
+        
+        const startButton = document.getElementById('start-button');
+        const restartButton = document.getElementById('restart-button');
+        const leaderboardButton = document.getElementById('leaderboard-button');
+        const backToMenuButton = document.getElementById('back-to-menu-button');
+        const saveScoreButton = document.getElementById('save-score-button');
+
+        const playerNameInput = document.getElementById('player-name');
+        const leaderboardList = document.getElementById('leaderboard-list');
+        // ... (other DOM elements remain the same)
+        const questionText = document.getElementById('question-text');
+        const categoryName = document.getElementById('category-name');
+        const answerOptionsContainer = document.getElementById('answer-options');
+        const scoreDisplay = document.getElementById('score');
+        const finalScoreDisplay = document.getElementById('final-score');
+        const questionCounter = document.getElementById('question-counter');
+        const totalQuestionsDisplay = document.getElementById('total-questions');
+        const timerBar = document.getElementById('timer-bar');
+
+        // --- Game State ---
+        let currentQuestionIndex, score, gameQuestions, questionTimer;
+
+        // --- Functions ---
+        function showScreen(screenToShow) {
+            [startScreen, quizScreen, endScreen, leaderboardScreen].forEach(screen => {
+                screen.classList.add('hidden');
+            });
+            screenToShow.classList.remove('hidden');
+            screenToShow.classList.add('animate-fadeIn');
+        }
+
+        function startGame() {
+            showScreen(quizScreen);
+            gameQuestions = questions.sort(() => Math.random() - 0.5).slice(0, 10);
+            currentQuestionIndex = 0;
+            score = 0;
+            scoreDisplay.textContent = score;
+            totalQuestionsDisplay.textContent = gameQuestions.length;
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if (currentQuestionIndex >= gameQuestions.length) {
+                showEndScreen();
+                return;
+            }
+            clearTimeout(questionTimer);
+            timerBar.classList.remove('timer-bar-animation');
+            void timerBar.offsetWidth;
+            timerBar.classList.add('timer-bar-animation');
+
+            const currentQuestion = gameQuestions[currentQuestionIndex];
+            questionText.textContent = currentQuestion.question;
+            categoryName.textContent = currentQuestion.category;
+            questionCounter.textContent = currentQuestionIndex + 1;
+            answerOptionsContainer.innerHTML = '';
+
+            const shuffledOptions = currentQuestion.options.sort(() => Math.random() - 0.5);
+            shuffledOptions.forEach(option => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.className = 'answer-btn p-4 bg-slate-600 rounded-lg font-semibold border-b-4 border-slate-800 transition-transform hover:scale-105';
+                button.onclick = () => selectAnswer(button, option, currentQuestion.answer);
+                answerOptionsContainer.appendChild(button);
+            });
+            questionTimer = setTimeout(timeUp, 10000);
+        }
+
+        function selectAnswer(button, selectedOption, correctAnswer) {
+            clearTimeout(questionTimer);
+            const allButtons = answerOptionsContainer.querySelectorAll('.answer-btn');
+            allButtons.forEach(btn => btn.classList.add('disabled'));
+
+            if (selectedOption === correctAnswer) {
+                score += 10;
+                scoreDisplay.textContent = score;
+                button.classList.add('correct');
+            } else {
+                button.classList.add('incorrect');
+                allButtons.forEach(btn => {
+                    if (btn.textContent === correctAnswer) btn.classList.add('correct');
+                });
+            }
+            setTimeout(() => {
+                currentQuestionIndex++;
+                loadQuestion();
+            }, 1500);
+        }
+
+        function timeUp() {
+            const allButtons = answerOptionsContainer.querySelectorAll('.answer-btn');
+            allButtons.forEach(btn => btn.classList.add('disabled'));
+            const correctAnswer = gameQuestions[currentQuestionIndex].answer;
+            allButtons.forEach(btn => {
+                if (btn.textContent === correctAnswer) btn.classList.add('correct');
+            });
+            setTimeout(() => {
+                currentQuestionIndex++;
+                loadQuestion();
+            }, 1500);
+        }
+
+        function showEndScreen() {
+            showScreen(endScreen);
+            finalScoreDisplay.textContent = score;
+            playerNameInput.value = ''; // Clear input field
+            saveScoreButton.disabled = false; // Enable save button
+            saveScoreButton.textContent = 'Simpan';
+        }
+        
+        function saveScore() {
+            const name = playerNameInput.value.trim();
+            if (!name) {
+                alert("Nama tidak boleh kosong!");
+                return;
+            }
+            
+            const highScores = JSON.parse(localStorage.getItem('perangOtakHighScores')) || [];
+            const newScore = { score: score, name: name };
+            
+            highScores.push(newScore);
+            highScores.sort((a, b) => b.score - a.score); // Sort descending
+            highScores.splice(10); // Keep only top 10
+            
+            localStorage.setItem('perangOtakHighScores', JSON.stringify(highScores));
+            
+            saveScoreButton.disabled = true;
+            saveScoreButton.textContent = 'Tersimpan!';
+        }
+        
+        function showLeaderboard() {
+            showScreen(leaderboardScreen);
+            const highScores = JSON.parse(localStorage.getItem('perangOtakHighScores')) || [];
+            leaderboardList.innerHTML = ''; // Clear previous list
+            
+            if (highScores.length === 0) {
+                leaderboardList.innerHTML = '<li class="text-center text-slate-400">Belum ada skor tersimpan. Jadilah yang pertama!</li>';
+            } else {
+                highScores.forEach((scoreItem, index) => {
+                    const li = document.createElement('li');
+                    li.className = 'flex justify-between items-center bg-slate-800 p-3 rounded-lg';
+                    li.innerHTML = `
+                        <div class="flex items-center">
+                            <span class="font-bold text-amber-400 w-8">${index + 1}.</span>
+                            <span class="font-semibold">${scoreItem.name}</span>
+                        </div>
+                        <span class="font-extrabold text-xl">${scoreItem.score}</span>
+                    `;
+                    leaderboardList.appendChild(li);
+                });
+            }
+        }
+
+        // --- Event Listeners ---
+        startButton.addEventListener('click', startGame);
+        restartButton.addEventListener('click', startGame);
+        leaderboardButton.addEventListener('click', showLeaderboard);
+        backToMenuButton.addEventListener('click', () => showScreen(startScreen));
+        saveScoreButton.addEventListener('click', saveScore);
+
+    </script>
+</body>
+</html>
