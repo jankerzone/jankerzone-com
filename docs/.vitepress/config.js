@@ -10,8 +10,8 @@ export default {
         text: "Getting Started",
         items: [
           { text: "About", link: "/about" },
-          { 
-            text: "Mini Apps & Tools", 
+          {
+            text: "Mini Apps & Tools",
             link: "/apps",
             items: [
               { text: "Brain War 2025", link: "/apps/brain-war" },
@@ -19,7 +19,16 @@ export default {
               { text: "Simple Calendar", link: "/apps/calendar" },
               { text: "Decision Maker", link: "/apps/decision-maker" },
               { text: "JSON to CSV", link: "/apps/json-csv" },
-            ]
+              { text: "Box Manager", link: "https://pindahan.jankerzone.com/" },
+              {
+                text: "Money Management",
+                link: "https://tagihanserampangan.vercel.app/",
+              },
+              {
+                text: "Web-based Video Editor",
+                link: "https://cangcut.jankerzone.com/",
+              },
+            ],
           },
           { text: "Notes", link: "/notes" },
         ],
