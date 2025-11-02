@@ -29,5 +29,15 @@ Convert JSON data to CSV format with advanced options and other utility tools.
 [**Open App →**](/apps/json-csv)
 
 
-> All apps run directly in your browser — no login, no ads, no trackers.
-> Just clean code and good vibes ✨
+## Box Management
+Moving house? Need help managing cardboard boxes so their contents are well-documented and neatly organized?
+[**Open App →**](https://pindahan.jankerzone.com/)
+
+
+## Money Management
+TagihanSerampangan is a app based management dashboard
+[**Open App →**](https://tagihanserampangan.jankerzone.com/)
+
+## Web Based Video Editor
+Cangcut is a forked version of a Lightweight Video Editor. Free for the web, desktop, and more, with features inspired by editors like CapCut.
+[**Open App →**](https://cangcut.jankerzone.com/)
