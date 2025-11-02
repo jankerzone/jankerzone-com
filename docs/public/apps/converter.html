@@ -1,254 +1,385 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Konverter Mata Uang dengan Pencarian</title>
-    
-    <!-- Tailwind CSS for styling -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Google Fonts: Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        .form-input:focus, .search-input:focus {
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.5);
-            border-color: #3b82f6;
-        }
-        .spinner {
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            border-left-color: #09f;
-            animation: spin 1s ease infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        /* Hide scrollbar but allow scrolling */
-        .search-results::-webkit-scrollbar { display: none; }
-        .search-results { -ms-overflow-style: none; scrollbar-width: none; }
-    </style>
-</head>
-<body class="bg-slate-100 flex items-center justify-center min-h-screen p-4">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <base href="/" />
+        <title>Konverter Mata Uang dengan Pencarian</title>
 
-    <div id="loading-overlay" class="fixed inset-0 bg-white bg-opacity-80 flex flex-col items-center justify-center z-50">
-        <div class="spinner"></div>
-        <p class="mt-4 text-slate-600 font-medium">Memuat data kurs terbaru...</p>
-    </div>
+        <!-- Tailwind CSS for styling -->
+        <script src="https://cdn.tailwindcss.com"></script>
 
-    <div class="w-full max-w-md bg-white rounded-2xl shadow-xl p-6 sm:p-8 transform transition-all opacity-0 -translate-y-4" id="converter-card">
-        <div class="text-center mb-8">
-            <h1 class="text-2xl sm:text-3xl font-bold text-slate-800">Konverter Mata Uang</h1>
-            <p class="text-slate-500 mt-2">Ketik nama negara atau mata uang untuk mencari.</p>
+        <!-- Google Fonts: Inter -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+            rel="stylesheet"
+        />
+
+        <style>
+            body {
+                font-family: "Inter", sans-serif;
+            }
+            .form-input:focus,
+            .search-input:focus {
+                outline: none;
+                box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.5);
+                border-color: #3b82f6;
+            }
+            .spinner {
+                border: 4px solid rgba(0, 0, 0, 0.1);
+                width: 36px;
+                height: 36px;
+                border-radius: 50%;
+                border-left-color: #09f;
+                animation: spin 1s ease infinite;
+            }
+            @keyframes spin {
+                0% {
+                    transform: rotate(0deg);
+                }
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+            /* Hide scrollbar but allow scrolling */
+            .search-results::-webkit-scrollbar {
+                display: none;
+            }
+            .search-results {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+        </style>
+    </head>
+    <body
+        class="bg-slate-100 flex items-center justify-center min-h-screen p-4"
+    >
+        <div
+            id="loading-overlay"
+            class="fixed inset-0 bg-white bg-opacity-80 flex flex-col items-center justify-center z-50"
+        >
+            <div class="spinner"></div>
+            <p class="mt-4 text-slate-600 font-medium">
+                Memuat data kurs terbaru...
+            </p>
         </div>
 
-        <div class="space-y-4">
-            <!-- From Currency -->
-            <div>
-                <label for="amount" class="block text-sm font-medium text-slate-600 mb-1">Jumlah</label>
-                <div class="flex">
-                    <input type="number" id="amount" value="100" class="form-input w-2/3 appearance-none rounded-l-lg border border-slate-300 px-4 py-3 text-slate-900 placeholder-slate-400 focus:z-10 sm:text-sm">
-                    <!-- Searchable Dropdown for 'From' currency -->
-                    <div id="from-currency-container" class="relative w-1/3"></div>
+        <div
+            class="w-full max-w-md bg-white rounded-2xl shadow-xl p-6 sm:p-8 transform transition-all opacity-0 -translate-y-4"
+            id="converter-card"
+        >
+            <div class="text-center mb-8">
+                <h1 class="text-2xl sm:text-3xl font-bold text-slate-800">
+                    Konverter Mata Uang
+                </h1>
+                <p class="text-slate-500 mt-2">
+                    Ketik nama negara atau mata uang untuk mencari.
+                </p>
+            </div>
+
+            <div class="space-y-4">
+                <!-- From Currency -->
+                <div>
+                    <label
+                        for="amount"
+                        class="block text-sm font-medium text-slate-600 mb-1"
+                        >Jumlah</label
+                    >
+                    <div class="flex">
+                        <input
+                            type="number"
+                            id="amount"
+                            value="100"
+                            class="form-input w-2/3 appearance-none rounded-l-lg border border-slate-300 px-4 py-3 text-slate-900 placeholder-slate-400 focus:z-10 sm:text-sm"
+                        />
+                        <!-- Searchable Dropdown for 'From' currency -->
+                        <div
+                            id="from-currency-container"
+                            class="relative w-1/3"
+                        ></div>
+                    </div>
+                </div>
+
+                <!-- Swap Button -->
+                <div class="flex items-center justify-center py-2">
+                    <div class="w-full h-px bg-slate-200"></div>
+                    <button
+                        id="swap-button"
+                        class="mx-4 p-2 rounded-full bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-transform duration-300 ease-in-out transform hover:rotate-180"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <polyline points="17 1 21 5 17 9"></polyline>
+                            <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+                            <polyline points="7 23 3 19 7 15"></polyline>
+                            <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+                        </svg>
+                    </button>
+                    <div class="w-full h-px bg-slate-200"></div>
+                </div>
+
+                <!-- To Currency -->
+                <div>
+                    <label
+                        for="result"
+                        class="block text-sm font-medium text-slate-600 mb-1"
+                        >Hasil Konversi</label
+                    >
+                    <div class="flex">
+                        <input
+                            type="text"
+                            id="result"
+                            readonly
+                            class="form-input w-2/3 bg-slate-100 rounded-l-lg border border-slate-300 px-4 py-3 text-slate-900 sm:text-sm font-semibold"
+                        />
+                        <!-- Searchable Dropdown for 'To' currency -->
+                        <div
+                            id="to-currency-container"
+                            class="relative w-1/3"
+                        ></div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Swap Button -->
-            <div class="flex items-center justify-center py-2">
-                <div class="w-full h-px bg-slate-200"></div>
-                <button id="swap-button" class="mx-4 p-2 rounded-full bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-transform duration-300 ease-in-out transform hover:rotate-180">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
-                </button>
-                <div class="w-full h-px bg-slate-200"></div>
-            </div>
-
-            <!-- To Currency -->
-            <div>
-                <label for="result" class="block text-sm font-medium text-slate-600 mb-1">Hasil Konversi</label>
-                <div class="flex">
-                    <input type="text" id="result" readonly class="form-input w-2/3 bg-slate-100 rounded-l-lg border border-slate-300 px-4 py-3 text-slate-900 sm:text-sm font-semibold">
-                    <!-- Searchable Dropdown for 'To' currency -->
-                    <div id="to-currency-container" class="relative w-1/3"></div>
-                </div>
+            <div class="text-center mt-8 bg-blue-50 p-4 rounded-lg">
+                <p id="rate-display" class="text-sm font-medium text-blue-800">
+                    1 USD = 16,250.00 IDR
+                </p>
+                <p id="last-updated" class="text-xs text-slate-500 mt-1">
+                    Terakhir diperbarui: ...
+                </p>
             </div>
         </div>
 
-        <div class="text-center mt-8 bg-blue-50 p-4 rounded-lg">
-            <p id="rate-display" class="text-sm font-medium text-blue-800">1 USD = 16,250.00 IDR</p>
-            <p id="last-updated" class="text-xs text-slate-500 mt-1">Terakhir diperbarui: ...</p>
-        </div>
-    </div>
+        <script>
+            // --- DOM Element Selection ---
+            const amountInput = document.getElementById("amount");
+            const resultInput = document.getElementById("result");
+            const swapButton = document.getElementById("swap-button");
+            const rateDisplay = document.getElementById("rate-display");
+            const lastUpdatedDisplay = document.getElementById("last-updated");
+            const loadingOverlay = document.getElementById("loading-overlay");
+            const converterCard = document.getElementById("converter-card");
+            const fromContainer = document.getElementById(
+                "from-currency-container",
+            );
+            const toContainer = document.getElementById(
+                "to-currency-container",
+            );
 
-    <script>
-        // --- DOM Element Selection ---
-        const amountInput = document.getElementById('amount');
-        const resultInput = document.getElementById('result');
-        const swapButton = document.getElementById('swap-button');
-        const rateDisplay = document.getElementById('rate-display');
-        const lastUpdatedDisplay = document.getElementById('last-updated');
-        const loadingOverlay = document.getElementById('loading-overlay');
-        const converterCard = document.getElementById('converter-card');
-        const fromContainer = document.getElementById('from-currency-container');
-        const toContainer = document.getElementById('to-currency-container');
+            // --- API & Data ---
+            const apiUrl = "https://open.er-api.com/v6/latest/USD";
+            let rates = {};
+            // Mapping of currency codes to full names and countries for search functionality
+            const currencyDetails = {
+                USD: { name: "United States Dollar", country: "United States" },
+                EUR: { name: "Euro", country: "Euro Area" },
+                JPY: { name: "Japanese Yen", country: "Japan" },
+                GBP: { name: "British Pound", country: "United Kingdom" },
+                AUD: { name: "Australian Dollar", country: "Australia" },
+                CAD: { name: "Canadian Dollar", country: "Canada" },
+                CHF: { name: "Swiss Franc", country: "Switzerland" },
+                CNY: { name: "Chinese Yuan", country: "China" },
+                HKD: { name: "Hong Kong Dollar", country: "Hong Kong" },
+                NZD: { name: "New Zealand Dollar", country: "New Zealand" },
+                SEK: { name: "Swedish Krona", country: "Sweden" },
+                KRW: { name: "South Korean Won", country: "South Korea" },
+                SGD: { name: "Singapore Dollar", country: "Singapore" },
+                NOK: { name: "Norwegian Krone", country: "Norway" },
+                MXN: { name: "Mexican Peso", country: "Mexico" },
+                INR: { name: "Indian Rupee", country: "India" },
+                RUB: { name: "Russian Ruble", country: "Russia" },
+                ZAR: { name: "South African Rand", country: "South Africa" },
+                TRY: { name: "Turkish Lira", country: "Turkey" },
+                BRL: { name: "Brazilian Real", country: "Brazil" },
+                IDR: { name: "Indonesian Rupiah", country: "Indonesia" },
+                MYR: { name: "Malaysian Ringgit", country: "Malaysia" },
+                THB: { name: "Thai Baht", country: "Thailand" },
+                PHP: { name: "Philippine Peso", country: "Philippines" },
+                VND: { name: "Vietnamese Dong", country: "Vietnam" },
+                SAR: { name: "Saudi Riyal", country: "Saudi Arabia" },
+                AED: { name: "UAE Dirham", country: "United Arab Emirates" },
+            };
 
-        // --- API & Data ---
-        const apiUrl = 'https://open.er-api.com/v6/latest/USD';
-        let rates = {};
-        // Mapping of currency codes to full names and countries for search functionality
-        const currencyDetails = {
-            "USD": { name: "United States Dollar", country: "United States" }, "EUR": { name: "Euro", country: "Euro Area" }, "JPY": { name: "Japanese Yen", country: "Japan" }, "GBP": { name: "British Pound", country: "United Kingdom" }, "AUD": { name: "Australian Dollar", country: "Australia" }, "CAD": { name: "Canadian Dollar", country: "Canada" }, "CHF": { name: "Swiss Franc", country: "Switzerland" }, "CNY": { name: "Chinese Yuan", country: "China" }, "HKD": { name: "Hong Kong Dollar", country: "Hong Kong" }, "NZD": { name: "New Zealand Dollar", country: "New Zealand" }, "SEK": { name: "Swedish Krona", country: "Sweden" }, "KRW": { name: "South Korean Won", country: "South Korea" }, "SGD": { name: "Singapore Dollar", country: "Singapore" }, "NOK": { name: "Norwegian Krone", country: "Norway" }, "MXN": { name: "Mexican Peso", country: "Mexico" }, "INR": { name: "Indian Rupee", country: "India" }, "RUB": { name: "Russian Ruble", country: "Russia" }, "ZAR": { name: "South African Rand", country: "South Africa" }, "TRY": { name: "Turkish Lira", country: "Turkey" }, "BRL": { name: "Brazilian Real", country: "Brazil" }, "IDR": { name: "Indonesian Rupiah", country: "Indonesia" }, "MYR": { name: "Malaysian Ringgit", country: "Malaysia" }, "THB": { name: "Thai Baht", country: "Thailand" }, "PHP": { name: "Philippine Peso", country: "Philippines" }, "VND": { name: "Vietnamese Dong", country: "Vietnam" }, "SAR": { name: "Saudi Riyal", country: "Saudi Arabia" }, "AED": { name: "UAE Dirham", country: "United Arab Emirates" }
-        };
-
-        /**
-         * Creates a searchable dropdown component inside a given container.
-         * @param {HTMLElement} container - The container element for the dropdown.
-         * @param {string} initialValue - The initial currency code to select.
-         */
-        function createSearchableDropdown(container, initialValue) {
-            container.innerHTML = `
+            /**
+             * Creates a searchable dropdown component inside a given container.
+             * @param {HTMLElement} container - The container element for the dropdown.
+             * @param {string} initialValue - The initial currency code to select.
+             */
+            function createSearchableDropdown(container, initialValue) {
+                container.innerHTML = `
                 <input type="text" class="search-input w-full rounded-r-lg border border-l-0 border-slate-300 bg-slate-50 px-3 py-3 text-slate-800 focus:z-10 sm:text-sm font-medium" placeholder="Cari...">
                 <div class="search-results hidden absolute top-full left-0 right-0 mt-1 bg-white border border-slate-300 rounded-md shadow-lg max-h-60 overflow-y-auto z-20"></div>
             `;
-            const input = container.querySelector('.search-input');
-            const resultsContainer = container.querySelector('.search-results');
-            
-            // Set initial value
-            container.dataset.value = initialValue;
-            input.value = initialValue;
+                const input = container.querySelector(".search-input");
+                const resultsContainer =
+                    container.querySelector(".search-results");
 
-            const renderResults = (filter = '') => {
-                resultsContainer.innerHTML = '';
-                const filteredCodes = Object.keys(rates).filter(code => {
-                    const details = currencyDetails[code];
-                    const searchTerm = filter.toLowerCase();
-                    return code.toLowerCase().includes(searchTerm) ||
-                           (details && details.name.toLowerCase().includes(searchTerm)) ||
-                           (details && details.country.toLowerCase().includes(searchTerm));
+                // Set initial value
+                container.dataset.value = initialValue;
+                input.value = initialValue;
+
+                const renderResults = (filter = "") => {
+                    resultsContainer.innerHTML = "";
+                    const filteredCodes = Object.keys(rates).filter((code) => {
+                        const details = currencyDetails[code];
+                        const searchTerm = filter.toLowerCase();
+                        return (
+                            code.toLowerCase().includes(searchTerm) ||
+                            (details &&
+                                details.name
+                                    .toLowerCase()
+                                    .includes(searchTerm)) ||
+                            (details &&
+                                details.country
+                                    .toLowerCase()
+                                    .includes(searchTerm))
+                        );
+                    });
+
+                    if (filteredCodes.length === 0) {
+                        resultsContainer.innerHTML = `<div class="p-2 text-slate-500 text-sm">Tidak ditemukan.</div>`;
+                    } else {
+                        filteredCodes.forEach((code) => {
+                            const details = currencyDetails[code];
+                            const option = document.createElement("div");
+                            option.className =
+                                "p-2 hover:bg-blue-50 cursor-pointer text-sm";
+                            option.textContent = `${code} - ${details ? details.name : "N/A"}`;
+                            option.dataset.value = code;
+                            option.addEventListener("click", () => {
+                                input.value = code;
+                                container.dataset.value = code;
+                                resultsContainer.classList.add("hidden");
+                                calculate();
+                            });
+                            resultsContainer.appendChild(option);
+                        });
+                    }
+                };
+
+                input.addEventListener("input", () =>
+                    renderResults(input.value),
+                );
+                input.addEventListener("focus", () => {
+                    renderResults(input.value);
+                    resultsContainer.classList.remove("hidden");
                 });
 
-                if (filteredCodes.length === 0) {
-                    resultsContainer.innerHTML = `<div class="p-2 text-slate-500 text-sm">Tidak ditemukan.</div>`;
-                } else {
-                    filteredCodes.forEach(code => {
-                        const details = currencyDetails[code];
-                        const option = document.createElement('div');
-                        option.className = 'p-2 hover:bg-blue-50 cursor-pointer text-sm';
-                        option.textContent = `${code} - ${details ? details.name : 'N/A'}`;
-                        option.dataset.value = code;
-                        option.addEventListener('click', () => {
-                            input.value = code;
-                            container.dataset.value = code;
-                            resultsContainer.classList.add('hidden');
-                            calculate();
+                // Hide results when clicking outside
+                document.addEventListener("click", (e) => {
+                    if (!container.contains(e.target)) {
+                        resultsContainer.classList.add("hidden");
+                        // Reset input to current value if user clicks away without selecting
+                        input.value = container.dataset.value;
+                    }
+                });
+            }
+
+            async function fetchRates() {
+                try {
+                    const response = await fetch(apiUrl);
+                    if (!response.ok)
+                        throw new Error("Network response was not ok");
+                    const data = await response.json();
+
+                    if (data.result === "success") {
+                        rates = data.rates;
+                        // Filter currencyDetails to only include codes available in the API response
+                        Object.keys(currencyDetails).forEach((code) => {
+                            if (!rates[code]) delete currencyDetails[code];
                         });
-                        resultsContainer.appendChild(option);
-                    });
+
+                        createSearchableDropdown(fromContainer, "USD");
+                        createSearchableDropdown(toContainer, "IDR");
+
+                        calculate();
+                        updateLastUpdatedTime(data.time_last_update_utc);
+                        showConverter();
+                    } else {
+                        throw new Error("API did not return success");
+                    }
+                } catch (error) {
+                    console.error("Failed to fetch exchange rates:", error);
+                    loadingOverlay.innerHTML = `<p class="text-red-600 font-medium">Gagal memuat data. Coba muat ulang halaman.</p>`;
                 }
-            };
-
-            input.addEventListener('input', () => renderResults(input.value));
-            input.addEventListener('focus', () => {
-                renderResults(input.value);
-                resultsContainer.classList.remove('hidden');
-            });
-            
-            // Hide results when clicking outside
-            document.addEventListener('click', (e) => {
-                if (!container.contains(e.target)) {
-                    resultsContainer.classList.add('hidden');
-                    // Reset input to current value if user clicks away without selecting
-                    input.value = container.dataset.value;
-                }
-            });
-        }
-        
-        async function fetchRates() {
-            try {
-                const response = await fetch(apiUrl);
-                if (!response.ok) throw new Error('Network response was not ok');
-                const data = await response.json();
-
-                if (data.result === 'success') {
-                    rates = data.rates;
-                    // Filter currencyDetails to only include codes available in the API response
-                    Object.keys(currencyDetails).forEach(code => {
-                        if (!rates[code]) delete currencyDetails[code];
-                    });
-                    
-                    createSearchableDropdown(fromContainer, 'USD');
-                    createSearchableDropdown(toContainer, 'IDR');
-                    
-                    calculate();
-                    updateLastUpdatedTime(data.time_last_update_utc);
-                    showConverter();
-                } else {
-                    throw new Error('API did not return success');
-                }
-            } catch (error) {
-                console.error('Failed to fetch exchange rates:', error);
-                loadingOverlay.innerHTML = `<p class="text-red-600 font-medium">Gagal memuat data. Coba muat ulang halaman.</p>`;
-            }
-        }
-        
-        function showConverter() {
-            loadingOverlay.style.display = 'none';
-            converterCard.style.opacity = '1';
-            converterCard.style.transform = 'translateY(0)';
-        }
-
-        function calculate() {
-            const fromCurrency = fromContainer.dataset.value;
-            const toCurrency = toContainer.dataset.value;
-            const amount = parseFloat(amountInput.value);
-
-            if (isNaN(amount) || !rates[fromCurrency] || !rates[toCurrency]) {
-                resultInput.value = '';
-                rateDisplay.textContent = 'Data tidak valid';
-                return;
             }
 
-            const rateFrom = rates[fromCurrency];
-            const rateTo = rates[toCurrency];
-            const convertedAmount = (amount / rateFrom) * rateTo;
-            resultInput.value = convertedAmount.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            
-            const singleUnitRate = (1 / rateFrom) * rateTo;
-            rateDisplay.textContent = `1 ${fromCurrency} = ${singleUnitRate.toLocaleString('id-ID', { minimumFractionDigits: 4, maximumFractionDigits: 4 })} ${toCurrency}`;
-        }
-        
-        function updateLastUpdatedTime(utcDateString) {
-            const date = new Date(utcDateString);
-            const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-            lastUpdatedDisplay.textContent = `Terakhir diperbarui: ${date.toLocaleDateString('id-ID', options)} WIB`;
-        }
+            function showConverter() {
+                loadingOverlay.style.display = "none";
+                converterCard.style.opacity = "1";
+                converterCard.style.transform = "translateY(0)";
+            }
 
-        // --- Event Listeners ---
-        amountInput.addEventListener('input', calculate);
-        
-        swapButton.addEventListener('click', () => {
-            const fromValue = fromContainer.dataset.value;
-            const toValue = toContainer.dataset.value;
-            
-            // Swap data values
-            fromContainer.dataset.value = toValue;
-            toContainer.dataset.value = fromValue;
-            
-            // Swap input text
-            fromContainer.querySelector('.search-input').value = toValue;
-            toContainer.querySelector('.search-input').value = fromValue;
-            
-            calculate();
-        });
+            function calculate() {
+                const fromCurrency = fromContainer.dataset.value;
+                const toCurrency = toContainer.dataset.value;
+                const amount = parseFloat(amountInput.value);
 
-        document.addEventListener('DOMContentLoaded', fetchRates);
-    </script>
-</body>
+                if (
+                    isNaN(amount) ||
+                    !rates[fromCurrency] ||
+                    !rates[toCurrency]
+                ) {
+                    resultInput.value = "";
+                    rateDisplay.textContent = "Data tidak valid";
+                    return;
+                }
+
+                const rateFrom = rates[fromCurrency];
+                const rateTo = rates[toCurrency];
+                const convertedAmount = (amount / rateFrom) * rateTo;
+                resultInput.value = convertedAmount.toLocaleString("id-ID", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                });
+
+                const singleUnitRate = (1 / rateFrom) * rateTo;
+                rateDisplay.textContent = `1 ${fromCurrency} = ${singleUnitRate.toLocaleString("id-ID", { minimumFractionDigits: 4, maximumFractionDigits: 4 })} ${toCurrency}`;
+            }
+
+            function updateLastUpdatedTime(utcDateString) {
+                const date = new Date(utcDateString);
+                const options = {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                };
+                lastUpdatedDisplay.textContent = `Terakhir diperbarui: ${date.toLocaleDateString("id-ID", options)} WIB`;
+            }
+
+            // --- Event Listeners ---
+            amountInput.addEventListener("input", calculate);
+
+            swapButton.addEventListener("click", () => {
+                const fromValue = fromContainer.dataset.value;
+                const toValue = toContainer.dataset.value;
+
+                // Swap data values
+                fromContainer.dataset.value = toValue;
+                toContainer.dataset.value = fromValue;
+
+                // Swap input text
+                fromContainer.querySelector(".search-input").value = toValue;
+                toContainer.querySelector(".search-input").value = fromValue;
+
+                calculate();
+            });
+
+            document.addEventListener("DOMContentLoaded", fetchRates);
+        </script>
+    </body>
 </html>

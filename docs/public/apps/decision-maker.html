@@ -1,165 +1,225 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pengambil Keputusan Acak</title>
-    
-    <!-- Tailwind CSS for styling -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Google Fonts: Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <style>
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: #f1f5f9; /* bg-slate-100 */
-        }
-        /* Custom animation for the result reveal */
-        @keyframes reveal {
-            0% { transform: scale(0.8); opacity: 0.5; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        .animate-reveal {
-            animation: reveal 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-        }
-        /* Custom animation for error shake */
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-            20%, 40%, 60%, 80% { transform: translateX(5px); }
-        }
-        .animate-shake {
-            animation: shake 0.5s ease-in-out;
-        }
-    </style>
-</head>
-<body class="text-slate-800">
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <base href="/" />
+        <title>Pengambil Keputusan Acak</title>
 
-    <div class="min-h-screen flex flex-col items-center justify-center p-4">
-        
-        <!-- Main Application Card -->
-        <div class="w-full max-w-lg bg-white rounded-2xl shadow-xl p-8">
-            <div class="text-center">
-                <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-800">Bingung Memilih?</h1>
-                <p class="mt-2 text-slate-500">Biar kami bantu putuskan untukmu!</p>
+        <!-- Tailwind CSS for styling -->
+        <script src="https://cdn.tailwindcss.com"></script>
+
+        <!-- Google Fonts: Inter -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+            rel="stylesheet"
+        />
+
+        <style>
+            body {
+                font-family: "Inter", sans-serif;
+                background-color: #f1f5f9; /* bg-slate-100 */
+            }
+            /* Custom animation for the result reveal */
+            @keyframes reveal {
+                0% {
+                    transform: scale(0.8);
+                    opacity: 0.5;
+                }
+                100% {
+                    transform: scale(1);
+                    opacity: 1;
+                }
+            }
+            .animate-reveal {
+                animation: reveal 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)
+                    forwards;
+            }
+            /* Custom animation for error shake */
+            @keyframes shake {
+                0%,
+                100% {
+                    transform: translateX(0);
+                }
+                10%,
+                30%,
+                50%,
+                70%,
+                90% {
+                    transform: translateX(-5px);
+                }
+                20%,
+                40%,
+                60%,
+                80% {
+                    transform: translateX(5px);
+                }
+            }
+            .animate-shake {
+                animation: shake 0.5s ease-in-out;
+            }
+        </style>
+    </head>
+    <body class="text-slate-800">
+        <div class="min-h-screen flex flex-col items-center justify-center p-4">
+            <!-- Main Application Card -->
+            <div class="w-full max-w-lg bg-white rounded-2xl shadow-xl p-8">
+                <div class="text-center">
+                    <h1
+                        class="text-3xl sm:text-4xl font-extrabold text-slate-800"
+                    >
+                        Bingung Memilih?
+                    </h1>
+                    <p class="mt-2 text-slate-500">
+                        Biar kami bantu putuskan untukmu!
+                    </p>
+                </div>
+
+                <div class="mt-8">
+                    <label
+                        for="options"
+                        class="block text-sm font-medium text-slate-600 mb-2"
+                        >Masukkan semua pilihanmu di sini (satu pilihan per
+                        baris):</label
+                    >
+                    <textarea
+                        id="options"
+                        rows="6"
+                        class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-400 focus:border-purple-400 transition"
+                        placeholder="Makan nasi goreng&#10;Makan sate padang&#10;Makan bakso&#10;Masak sendiri di rumah"
+                    ></textarea>
+                </div>
+
+                <div class="mt-6">
+                    <button
+                        id="decide-button"
+                        class="w-full bg-purple-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-transform transform hover:scale-105"
+                    >
+                        Dapatkan Keputusan!
+                    </button>
+                </div>
             </div>
 
-            <div class="mt-8">
-                <label for="options" class="block text-sm font-medium text-slate-600 mb-2">Masukkan semua pilihanmu di sini (satu pilihan per baris):</label>
-                <textarea id="options" rows="6" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-400 focus:border-purple-400 transition" placeholder="Makan nasi goreng&#10;Makan sate padang&#10;Makan bakso&#10;Masak sendiri di rumah"></textarea>
-            </div>
+            <footer class="text-center mt-8">
+                <p class="text-sm text-slate-400">&copy; 2025 Jankerzone.com</p>
+            </footer>
+        </div>
 
-            <div class="mt-6">
-                <button id="decide-button" class="w-full bg-purple-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-transform transform hover:scale-105">
-                    Dapatkan Keputusan!
+        <!-- Result Modal -->
+        <div
+            id="result-modal"
+            class="hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50"
+        >
+            <div
+                class="bg-white rounded-2xl shadow-2xl p-8 sm:p-12 text-center max-w-md w-full"
+            >
+                <h2
+                    id="modal-title"
+                    class="text-xl font-bold text-slate-600 mb-4"
+                >
+                    Dan pilihannya adalah...
+                </h2>
+                <div
+                    id="result-text"
+                    class="my-6 min-h-[80px] flex items-center justify-center text-4xl font-extrabold text-purple-600"
+                >
+                    <!-- Result will be displayed here -->
+                </div>
+                <button
+                    id="close-button"
+                    class="w-full sm:w-auto bg-slate-200 text-slate-800 font-bold py-2 px-8 rounded-lg hover:bg-slate-300 transition"
+                >
+                    Coba Lagi
                 </button>
             </div>
         </div>
 
-        <footer class="text-center mt-8">
-            <p class="text-sm text-slate-400">&copy; 2025 Jankerzone.com</p>
-        </footer>
-    </div>
+        <script>
+            // --- DOM Element Selection ---
+            const optionsTextarea = document.getElementById("options");
+            const decideButton = document.getElementById("decide-button");
+            const resultModal = document.getElementById("result-modal");
+            const resultText = document.getElementById("result-text");
+            const modalTitle = document.getElementById("modal-title");
+            const closeButton = document.getElementById("close-button");
 
-    <!-- Result Modal -->
-    <div id="result-modal" class="hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-2xl shadow-2xl p-8 sm:p-12 text-center max-w-md w-full">
-            <h2 id="modal-title" class="text-xl font-bold text-slate-600 mb-4">Dan pilihannya adalah...</h2>
-            <div id="result-text" class="my-6 min-h-[80px] flex items-center justify-center text-4xl font-extrabold text-purple-600">
-                <!-- Result will be displayed here -->
-            </div>
-            <button id="close-button" class="w-full sm:w-auto bg-slate-200 text-slate-800 font-bold py-2 px-8 rounded-lg hover:bg-slate-300 transition">
-                Coba Lagi
-            </button>
-        </div>
-    </div>
+            let rouletteInterval;
 
-    <script>
-        // --- DOM Element Selection ---
-        const optionsTextarea = document.getElementById('options');
-        const decideButton = document.getElementById('decide-button');
-        const resultModal = document.getElementById('result-modal');
-        const resultText = document.getElementById('result-text');
-        const modalTitle = document.getElementById('modal-title');
-        const closeButton = document.getElementById('close-button');
-        
-        let rouletteInterval;
+            // --- Functions ---
 
-        // --- Functions ---
+            /**
+             * Starts the decision process.
+             */
+            function makeDecision() {
+                // 1. Get options from textarea
+                const options = optionsTextarea.value
+                    .split("\n")
+                    .map((option) => option.trim())
+                    .filter((option) => option !== ""); // Remove empty lines
 
-        /**
-         * Starts the decision process.
-         */
-        function makeDecision() {
-            // 1. Get options from textarea
-            const options = optionsTextarea.value
-                .split('\n')
-                .map(option => option.trim())
-                .filter(option => option !== ''); // Remove empty lines
-
-            // 2. Validate if there are enough options
-            if (options.length < 2) {
-                // Shake the textarea to indicate an error
-                optionsTextarea.classList.add('animate-shake');
-                setTimeout(() => {
-                    optionsTextarea.classList.remove('animate-shake');
-                }, 500);
-                return;
-            }
-
-            // 3. Show the modal and start the animation
-            resultModal.classList.remove('hidden');
-            modalTitle.textContent = "Memilih secara acak...";
-            resultText.classList.remove('animate-reveal');
-
-            // 4. Roulette/Shuffle animation
-            let shuffleCount = 0;
-            rouletteInterval = setInterval(() => {
-                shuffleCount++;
-                // Pick a random option for display during shuffle
-                const randomOption = options[Math.floor(Math.random() * options.length)];
-                resultText.textContent = randomOption;
-
-                // Stop after a certain time (e.g., 3 seconds)
-                if (shuffleCount > 30) { 
-                    clearInterval(rouletteInterval);
-                    revealFinalChoice(options);
+                // 2. Validate if there are enough options
+                if (options.length < 2) {
+                    // Shake the textarea to indicate an error
+                    optionsTextarea.classList.add("animate-shake");
+                    setTimeout(() => {
+                        optionsTextarea.classList.remove("animate-shake");
+                    }, 500);
+                    return;
                 }
-            }, 100); // Change option every 100ms
-        }
 
-        /**
-         * Reveals the final choice after the animation.
-         * @param {string[]} options - The array of options.
-         */
-        function revealFinalChoice(options) {
-            // Pick the final, true random choice
-            const finalChoice = options[Math.floor(Math.random() * options.length)];
-            
-            modalTitle.textContent = "Dan pilihannya adalah...";
-            resultText.textContent = finalChoice;
-            resultText.classList.add('animate-reveal');
-        }
+                // 3. Show the modal and start the animation
+                resultModal.classList.remove("hidden");
+                modalTitle.textContent = "Memilih secara acak...";
+                resultText.classList.remove("animate-reveal");
 
-        // --- Event Listeners ---
-        decideButton.addEventListener('click', makeDecision);
-        
-        closeButton.addEventListener('click', () => {
-            resultModal.classList.add('hidden');
-            clearInterval(rouletteInterval); // Stop animation if modal is closed early
-        });
+                // 4. Roulette/Shuffle animation
+                let shuffleCount = 0;
+                rouletteInterval = setInterval(() => {
+                    shuffleCount++;
+                    // Pick a random option for display during shuffle
+                    const randomOption =
+                        options[Math.floor(Math.random() * options.length)];
+                    resultText.textContent = randomOption;
 
-        // Allow closing modal by clicking the background overlay
-        resultModal.addEventListener('click', (event) => {
-            if (event.target === resultModal) {
-                resultModal.classList.add('hidden');
-                clearInterval(rouletteInterval);
+                    // Stop after a certain time (e.g., 3 seconds)
+                    if (shuffleCount > 30) {
+                        clearInterval(rouletteInterval);
+                        revealFinalChoice(options);
+                    }
+                }, 100); // Change option every 100ms
             }
-        });
-    </script>
-</body>
+
+            /**
+             * Reveals the final choice after the animation.
+             * @param {string[]} options - The array of options.
+             */
+            function revealFinalChoice(options) {
+                // Pick the final, true random choice
+                const finalChoice =
+                    options[Math.floor(Math.random() * options.length)];
+
+                modalTitle.textContent = "Dan pilihannya adalah...";
+                resultText.textContent = finalChoice;
+                resultText.classList.add("animate-reveal");
+            }
+
+            // --- Event Listeners ---
+            decideButton.addEventListener("click", makeDecision);
+
+            closeButton.addEventListener("click", () => {
+                resultModal.classList.add("hidden");
+                clearInterval(rouletteInterval); // Stop animation if modal is closed early
+            });
+
+            // Allow closing modal by clicking the background overlay
+            resultModal.addEventListener("click", (event) => {
+                if (event.target === resultModal) {
+                    resultModal.classList.add("hidden");
+                    clearInterval(rouletteInterval);
+                }
+            });
+        </script>
+    </body>
 </html>

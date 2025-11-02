@@ -1,0 +1,5 @@
+/apps/*.html
+  Content-Type: text/html
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin

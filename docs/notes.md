@@ -4,8 +4,6 @@ Welcome to my digital garden — a collection of short notes, experiments, and d
 
 Each note is a work-in-progress, so expect things to evolve as I learn more.
 
----
-
 ## Recent Notes
 
 - [Building AI Experiments with VitePress](/notes/ai-experiments)
