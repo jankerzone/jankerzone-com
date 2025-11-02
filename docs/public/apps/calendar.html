@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalender Bulanan</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .calendar-container {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 100%; /* Ubah menjadi 100% agar menyesuaikan layar */
+            max-width: 600px; /* Lebar maksimum tetap 600px */
+            box-sizing: border-box; /* Pastikan padding tidak menambah lebar */
+        }
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .calendar-header h2 {
+            margin: 0;
+            font-size: 28px;
+        }
+        .calendar-header button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .calendar-header button:hover {
+            background-color: #0056b3;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+        .calendar-grid div {
+            text-align: center;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 16px; /* Kecilkan font untuk layar kecil */
+            position: relative;
+        }
+        .day-name {
+            font-weight: bold;
+            color: #333;
+            font-size: 18px;
+        }
+        .day {
+            background-color: #f8f9fa;
+            cursor: pointer;
+        }
+        .day:hover {
+            background-color: #e9ecef;
+        }
+        .holiday {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .api-holiday {
+            color: #dc3545;
+            font-weight: bold;
+            position: relative;
+        }
+        .api-holiday:hover::after {
+            content: attr(data-holiday-name);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: white;
+            padding: 6px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 10;
+            opacity: 1;
+            transition: opacity 0.2s;
+        }
+        .empty {
+            background-color: transparent;
+        }
+        .current-day {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+        }
+
+        /* Media query untuk layar kecil (smartphone) */
+        @media (max-width: 600px) {
+            .calendar-container {
+                padding: 15px;
+            }
+            .calendar-header h2 {
+                font-size: 20px;
+            }
+            .calendar-header button {
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+            .calendar-grid div {
+                padding: 8px;
+                font-size: 14px;
+            }
+            .day-name {
+                font-size: 14px;
+            }
+            .api-holiday:hover::after {
+                font-size: 10px;
+                padding: 5px 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calendar-container">
+        <div class="calendar-header">
+            <button onclick="prevMonth()">Prev</button>
+            <h2 id="month-year"></h2>
+            <button onclick="nextMonth()">Next</button>
+        </div>
+        <div class="calendar-grid" id="calendar">
+            <div class="day-name">Min</div>
+            <div class="day-name">Sen</div>
+            <div class="day-name">Sel</div>
+            <div class="day-name">Rab</div>
+            <div class="day-name">Kam</div>
+            <div class="day-name">Jum</div>
+            <div class="day-name">Sab</div>
+        </div>
+    </div>
+
+    <script>
+        let currentDate = new Date();
+        let currentMonth = currentDate.getMonth();
+        let currentYear = currentDate.getFullYear();
+        let holidays = [];
+
+        const monthNames = [
+            "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+            "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+        ];
+
+        async function fetchHolidays(month, year) {
+            try {
+                const response = await fetch(`https://dayoffapi.vercel.app/api?month=${month + 1}&year=${year}`);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch holidays: ${response.status} ${response.statusText}`);
+                }
+                holidays = await response.json();
+                console.log(`Holidays for ${month + 1}/${year}:`, holidays);
+            } catch (error) {
+                console.error('Error fetching holidays:', error);
+                holidays = [];
+            }
+        }
+
+        async function renderCalendar(month, year) {
+            const calendar = document.getElementById("calendar");
+            const monthYear = document.getElementById("month-year");
+            monthYear.textContent = `${monthNames[month]} ${year}`;
+
+            await fetchHolidays(month, year);
+
+            while (calendar.children.length > 7) {
+                calendar.removeChild(calendar.lastChild);
+            }
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            for (let i = 0; i < firstDay; i++) {
+                const emptyDiv = document.createElement("div");
+                emptyDiv.className = "empty";
+                calendar.appendChild(emptyDiv);
+            }
+
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dayDiv = document.createElement("div");
+                dayDiv.className = "day";
+                dayDiv.textContent = i;
+
+                if (
+                    i === currentDate.getDate() &&
+                    month === currentDate.getMonth() &&
+                    year === currentDate.getFullYear()
+                ) {
+                    dayDiv.className += " current-day";
+                }
+
+                const currentDayOfWeek = new Date(year, month, i).getDay();
+                if (currentDayOfWeek === 0 || currentDayOfWeek === 6) {
+                    dayDiv.className += " holiday";
+                }
+
+                const formattedDate = `${year}-${String(month + 1).padStart(2, '0')}-${i}`;
+                const holiday = holidays.find(h => h.tanggal === formattedDate);
+                if (holiday) {
+                    console.log(`Found holiday on ${formattedDate}: ${holiday.keterangan}`);
+                    dayDiv.className += " api-holiday";
+                    dayDiv.setAttribute("data-holiday-name", holiday.keterangan);
+                }
+
+                calendar.appendChild(dayDiv);
+            }
+        }
+
+        function prevMonth() {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            renderCalendar(currentMonth, currentYear);
+        }
+
+        function nextMonth() {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            renderCalendar(currentMonth, currentYear);
+        }
+
+        renderCalendar(currentMonth, currentYear);
+    </script>
+</body>
+</html>
