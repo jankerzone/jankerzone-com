@@ -1,6 +1,9 @@
 export default {
   title: "Jankerzone",
   description: "My corner of the internet.",
+  head: [
+    ['link', { rel: 'icon', href: '/favicon.ico' }]
+  ],
   themeConfig: {
     search: {
       provider: "local",
