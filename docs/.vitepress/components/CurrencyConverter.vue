@@ -1,16 +1,12 @@
 <template>
-  <div class="converter-container flex items-center justify-center min-h-[600px] p-4 bg-slate-100 font-sans rounded-xl mt-4 relative">
+  <div class="converter-container flex items-center justify-center p-4 font-sans mt-4 relative w-full">
     
     <div v-show="isLoading" class="absolute inset-0 bg-white bg-opacity-80 flex flex-col items-center justify-center z-50 rounded-xl">
         <div class="spinner"></div>
         <p class="mt-4 text-slate-600 font-medium">Memuat data kurs terbaru...</p>
     </div>
 
-    <div v-show="!isLoading" class="w-full max-w-md bg-white rounded-2xl shadow-xl p-6 sm:p-8 transition-opacity duration-500">
-        <div class="text-center mb-8">
-            <h1 class="text-2xl sm:text-3xl font-bold text-slate-800">Konverter Mata Uang</h1>
-            <p class="text-slate-500 mt-2 text-sm">Ketik nama negara atau mata uang untuk mencari.</p>
-        </div>
+    <div v-show="!isLoading" class="w-full max-w-2xl transition-opacity duration-500">
 
         <div class="space-y-4">
             <!-- From Currency -->
@@ -59,9 +55,9 @@
             </div>
         </div>
 
-        <div class="text-center mt-8 bg-blue-50 p-4 rounded-lg">
+        <div class="text-center mt-8 bg-transparent p-4 rounded-lg">
             <p v-if="rateError" class="text-sm font-medium text-red-600">{{ rateError }}</p>
-            <p v-else class="text-sm font-medium text-blue-800">1 {{ fromCurrency }} = {{ singleUnitRateFormatted }} {{ toCurrency }}</p>
+            <p v-else class="text-sm font-medium text-slate-600">1 {{ fromCurrency }} = {{ singleUnitRateFormatted }} {{ toCurrency }}</p>
             <p class="text-xs text-slate-500 mt-1">{{ lastUpdatedText }}</p>
         </div>
     </div>

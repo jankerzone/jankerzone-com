@@ -1,42 +1,40 @@
 <template>
-  <div class="perang-otak-container flex items-center justify-center min-h-[800px] p-4 bg-slate-800 text-slate-200 font-sans rounded-xl mt-4">
-    <div id="game-container" class="w-full max-w-lg mx-auto">
+  <div class="perang-otak-container flex flex-col items-center min-h-[800px] p-0 font-sans mt-4 w-full">
+    <div id="game-container" class="w-full max-w-3xl mx-auto">
       
       <!-- Start Screen -->
-      <div v-show="currentScreen === 'start'" class="text-center p-8 bg-slate-700 rounded-2xl shadow-2xl animate-fadeIn">
-        <h1 class="text-5xl font-extrabold mb-2 text-white">Perang Otak</h1>
-        <p class="text-2xl font-bold text-amber-400 mb-8">Edisi 2025</p>
-        <p class="text-slate-300 mb-6">Uji pengetahuanmu dengan 10 pertanyaan dari bank soal 100 pertanyaan. Siap?</p>
+      <div v-show="currentScreen === 'start'" class="text-center py-8 animate-fadeIn">
+        <p class="text-slate-600 dark:text-slate-300 mb-6 font-medium text-lg">Uji pengetahuanmu dengan 10 pertanyaan dari bank soal 100 pertanyaan. Siap?</p>
         <button @click="startGame" class="w-full bg-amber-500 text-slate-900 font-bold py-4 px-6 rounded-lg text-xl hover:bg-amber-400 transition-transform transform hover:scale-105 mb-4">
           MULAI MAIN
         </button>
-        <button @click="showScreen('leaderboard')" class="w-full bg-slate-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-slate-500 transition">
+        <button @click="showScreen('leaderboard')" class="w-full bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-white font-bold py-3 px-6 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 transition border border-slate-300 dark:border-slate-600">
           Lihat Papan Skor
         </button>
       </div>
 
       <!-- Quiz Screen -->
-      <div v-show="currentScreen === 'quiz'" class="bg-slate-700 rounded-2xl shadow-2xl overflow-hidden">
-        <header class="p-4 bg-slate-900/50 flex justify-between items-center text-white">
+      <div v-show="currentScreen === 'quiz'" class="rounded-2xl overflow-hidden mt-4">
+        <header class="p-4 bg-slate-100 dark:bg-slate-800 flex justify-between items-center text-slate-800 dark:text-white border border-slate-200 dark:border-slate-700 rounded-t-xl">
           <div><span class="font-bold">Skor: <span>{{ score }}</span></span></div>
-          <div class="font-semibold text-slate-400">Pertanyaan <span>{{ currentQuestionIndex + 1 }}</span> / <span>{{ totalQuestions }}</span></div>
+          <div class="font-semibold text-slate-500 dark:text-slate-400">Pertanyaan <span>{{ currentQuestionIndex + 1 }}</span> / <span>{{ totalQuestions }}</span></div>
         </header>
-        <main class="p-6">
-          <div class="text-center mb-4"><p class="text-sm text-slate-400 font-medium">{{ currentQuestion?.category }}</p></div>
-          <div class="w-full bg-slate-600 rounded-full h-2.5 mb-6 overflow-hidden">
+        <main class="py-6 px-2 sm:px-6">
+          <div class="text-center mb-4"><p class="text-sm text-slate-500 dark:text-slate-400 font-medium">{{ currentQuestion?.category }}</p></div>
+          <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2.5 mb-6 overflow-hidden">
              <!-- Force re-render of animation by changing key -->
-            <div :key="timerKey" class="bg-amber-400 h-2.5 rounded-full timer-bar-animation"></div>
+            <div :key="timerKey" class="bg-amber-500 dark:bg-amber-400 h-2.5 rounded-full timer-bar-animation"></div>
           </div>
-          <div class="bg-slate-800 p-6 rounded-xl min-h-[120px] flex items-center justify-center text-center mb-6">
-            <h3 class="text-xl font-semibold leading-relaxed text-white">{{ currentQuestion?.question }}</h3>
+          <div class="bg-slate-50 dark:bg-slate-800 p-6 rounded-xl min-h-[120px] flex items-center justify-center text-center mb-8 border border-slate-200 dark:border-slate-700 shadow-sm">
+            <h3 class="text-xl sm:text-2xl font-semibold leading-relaxed text-slate-800 dark:text-white">{{ currentQuestion?.question }}</h3>
           </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             <button 
                 v-for="(opt, idx) in currentOptions" 
                 :key="idx"
                 :disabled="buttonsDisabled"
                 :class="[
-                    'p-4 bg-slate-600 rounded-lg font-semibold border-b-4 transition-transform hover:scale-105 text-white',
+                    'p-5 bg-white dark:bg-slate-700 rounded-xl font-semibold border-b-4 transition-transform hover:-translate-y-1 text-slate-700 dark:text-white border border-slate-200 dark:border-slate-600 shadow-sm',
                     getButtonClass(opt)
                 ]"
                 @click="selectAnswer(opt)"
@@ -48,14 +46,14 @@
       </div>
       
       <!-- End Screen -->
-      <div v-show="currentScreen === 'end'" class="text-center p-8 bg-slate-700 rounded-2xl shadow-2xl">
-        <h1 class="text-4xl font-extrabold mb-4 text-white">Permainan Selesai!</h1>
-        <p class="text-xl text-slate-300 mb-2">Skor Akhir Kamu:</p>
-        <p class="text-7xl font-black text-amber-400 mb-6">{{ score }}</p>
-        <div class="w-full max-w-sm mx-auto">
-          <label class="block text-sm font-medium text-slate-300 mb-2">Simpan skormu ke Papan Skor:</label>
+      <div v-show="currentScreen === 'end'" class="text-center py-8">
+        <h2 class="text-4xl font-extrabold mb-4 text-slate-800 dark:text-white">Permainan Selesai!</h2>
+        <p class="text-xl text-slate-500 dark:text-slate-400 mb-2">Skor Akhir Kamu:</p>
+        <p class="text-7xl font-black text-amber-500 dark:text-amber-400 mb-8">{{ score }}</p>
+        <div class="w-full max-w-sm mx-auto bg-slate-50 dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700">
+          <label class="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-3 text-left">Simpan skormu ke Papan Skor:</label>
           <div class="flex gap-2">
-            <input v-model="playerName" type="text" placeholder="Masukkan namamu..." class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:ring-2 focus:ring-amber-400 focus:border-amber-400 transition" />
+            <input v-model="playerName" type="text" placeholder="Masukkan namamu..." class="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-800 dark:text-white focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition shadow-sm" />
             <button @click="saveScore" :disabled="!playerName || scoreSaved" class="bg-green-600 text-white font-bold py-3 px-5 rounded-lg hover:bg-green-500 transition disabled:opacity-50 disabled:cursor-not-allowed">
               {{ scoreSaved ? 'Tersimpan!' : 'Simpan' }}
             </button>
@@ -67,19 +65,19 @@
       </div>
       
       <!-- Leaderboard Screen -->
-      <div v-show="currentScreen === 'leaderboard'" class="p-8 bg-slate-700 rounded-2xl shadow-2xl">
-        <h1 class="text-4xl font-extrabold mb-6 text-center text-amber-400">Papan Skor</h1>
-        <ul class="space-y-3 mb-6 max-h-96 overflow-y-auto">
-          <li v-if="highScores.length === 0" class="text-center text-slate-400">Belum ada skor tersimpan. Jadilah yang pertama!</li>
-          <li v-for="(item, index) in highScores" :key="index" class="flex justify-between items-center bg-slate-800 p-3 rounded-lg text-white">
+      <div v-show="currentScreen === 'leaderboard'" class="py-8 w-full max-w-2xl mx-auto mt-4">
+        <h2 class="text-3xl font-extrabold mb-8 text-center text-amber-500 dark:text-amber-400">Papan Skor</h2>
+        <ul class="space-y-3 mb-8 max-h-96 overflow-y-auto pr-2">
+          <li v-if="highScores.length === 0" class="text-center text-slate-500 dark:text-slate-400 p-8 border border-dashed border-slate-300 dark:border-slate-700 rounded-xl">Belum ada skor tersimpan. Jadilah yang pertama!</li>
+          <li v-for="(item, index) in highScores" :key="index" class="flex justify-between items-center bg-slate-50 dark:bg-slate-800 p-4 rounded-xl text-slate-800 dark:text-white shadow-sm border border-slate-200 dark:border-slate-700">
             <div class="flex items-center">
-              <span class="font-bold text-amber-400 w-8">{{ index + 1 }}.</span>
-              <span class="font-semibold">{{ item.name }}</span>
+              <span class="font-bold text-amber-500 dark:text-amber-400 w-8 text-lg">{{ index + 1 }}.</span>
+              <span class="font-semibold text-lg">{{ item.name }}</span>
             </div>
-            <span class="font-extrabold text-xl">{{ item.score }}</span>
+            <span class="font-extrabold text-2xl text-slate-700 dark:text-slate-200">{{ item.score }}</span>
           </li>
         </ul>
-        <button @click="showScreen('start')" class="w-full bg-slate-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-slate-500 transition">
+        <button @click="showScreen('start')" class="w-full bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-white font-bold py-4 px-6 rounded-xl hover:bg-slate-300 dark:hover:bg-slate-600 transition border border-slate-300 dark:border-slate-600">
           Kembali ke Menu
         </button>
       </div>
@@ -183,13 +181,13 @@ const timeUp = () => {
 }
 
 const getButtonClass = (opt) => {
-  if (!buttonsDisabled.value) return 'border-slate-800'
+  if (!buttonsDisabled.value) return 'border-b-slate-300 dark:border-b-slate-800'
   
   if (opt === currentQuestion.value.answer) {
-    return 'bg-green-500 border-green-600 text-white scale-105'
+    return 'bg-green-500 dark:bg-green-500 border-green-600 dark:border-green-600 text-white -translate-y-1'
   }
   if (opt === selectedAnswer.value) {
-    return 'bg-red-500 border-red-600 opacity-70'
+    return 'bg-red-500 dark:bg-red-500 border-red-600 dark:border-red-600 text-white opacity-90'
   }
   return 'opacity-50'
 }
