@@ -22,6 +22,7 @@ export default {
               { text: "Simple Calendar", link: "https://robsan.my.id/apps/calendar" },
               { text: "Decision Maker", link: "https://robsan.my.id/apps/decision-maker" },
               { text: "JSON to CSV", link: "https://robsan.my.id/apps/json-csv" },
+              { text: "Servis Rutin", link: "https://servisrutin.jankerzone.com/" },
               { text: "Box Manager", link: "https://pindahan.jankerzone.com/" },
               {
                 text: "Money Management",
