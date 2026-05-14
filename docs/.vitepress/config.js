@@ -17,15 +17,15 @@ export default {
             text: "Mini Apps & Tools",
             link: "/apps",
             items: [
-              { text: "Brain War 2025", link: "/apps/brain-war" },
-              { text: "Currency Converter", link: "/apps/converter" },
-              { text: "Simple Calendar", link: "/apps/calendar" },
-              { text: "Decision Maker", link: "/apps/decision-maker" },
-              { text: "JSON to CSV", link: "/apps/json-csv" },
+              { text: "Brain War 2025", link: "https://robsan.my.id/apps/brain-war" },
+              { text: "Currency Converter", link: "https://robsan.my.id/apps/converter" },
+              { text: "Simple Calendar", link: "https://robsan.my.id/apps/calendar" },
+              { text: "Decision Maker", link: "https://robsan.my.id/apps/decision-maker" },
+              { text: "JSON to CSV", link: "https://robsan.my.id/apps/json-csv" },
               { text: "Box Manager", link: "https://pindahan.jankerzone.com/" },
               {
                 text: "Money Management",
-                link: "https://tagihanserampangan.vercel.app/",
+                link: "https://tagihan.jankerzone.com/",
               },
               {
                 text: "Web-based Video Editor",

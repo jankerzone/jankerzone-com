@@ -1,8 +1,5 @@
 # Brain War
 
-
 Single-player quiz game with 100 questions across multiple categories.
 
-<ClientOnly>
-  <BrainWar />
-</ClientOnly>
+[**Play Game →**](https://robsan.my.id/apps/brain-war)

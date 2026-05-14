@@ -2,6 +2,4 @@
 
 Live currency exchange rates and calculator with searchable dropdowns.
 
-<ClientOnly>
-  <CurrencyConverter />
-</ClientOnly>
+[**Open App →**](https://robsan.my.id/apps/converter)
