@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalender Bulanan</title>
+    <!-- Playroom: IBM Plex Mono for labels -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* ===== Playroom · light (amber accent) ===== */
+        :root {
+            --bg: #F4F1EA; --bg-alt: #EFEBE1; --surface: #FDFCF8;
+            --text: #1C1B22; --muted: #6B6973; --divider: #E2DED2;
+            --amber: #EFA63A; --amber-deep: #C07F18; --coral: #E8603C;
+            --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            --mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+        }
+        body {
+            font-family: var(--sans);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 16px;
+            background-color: var(--bg);
+            color: var(--text);
+            -webkit-font-smoothing: antialiased;
+        }
+        .calendar-container {
+            background-color: var(--surface);
+            border: 1px solid var(--divider);
+            border-radius: 18px;
+            box-shadow: 0 6px 20px rgba(28, 27, 34, 0.06);
+            padding: 24px;
+            width: 100%;
+            max-width: 600px;
+            box-sizing: border-box;
+        }
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+        }
+        .calendar-header h2 {
+            margin: 0;
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+        }
+        .calendar-header button {
+            background-color: var(--amber);
+            color: #1C1B22;
+            border: none;
+            padding: 9px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: var(--mono);
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 3px 0 var(--amber-deep);
+            transition: transform 0.12s ease, box-shadow 0.12s ease;
+        }
+        .calendar-header button:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 var(--amber-deep);
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+        .calendar-grid div {
+            text-align: center;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 16px;
+            position: relative;
+        }
+        .day-name {
+            font-family: var(--mono);
+            font-weight: 500;
+            color: var(--muted);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .day {
+            background-color: var(--bg-alt);
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: border-color 0.15s ease, background-color 0.15s ease;
+        }
+        .day:hover {
+            background-color: var(--surface);
+            border-color: var(--divider);
+        }
+        .holiday {
+            color: var(--coral);
+            font-weight: 700;
+        }
+        .api-holiday {
+            color: var(--coral);
+            font-weight: 700;
+            position: relative;
+        }
+        .api-holiday:hover::after {
+            content: attr(data-holiday-name);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--text);
+            color: var(--surface);
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-family: var(--mono);
+            font-size: 11px;
+            white-space: nowrap;
+            z-index: 10;
+            opacity: 1;
+            transition: opacity 0.2s;
+            margin-bottom: 4px;
+        }
+        .empty {
+            background-color: transparent;
+        }
+        .current-day {
+            background-color: var(--amber);
+            color: #1C1B22;
+            font-weight: 800;
+            box-shadow: 0 2px 0 var(--amber-deep);
+        }
+
+        /* Media query untuk layar kecil (smartphone) */
+        @media (max-width: 600px) {
+            .calendar-container {
+                padding: 16px;
+            }
+            .calendar-header h2 {
+                font-size: 20px;
+            }
+            .calendar-header button {
+                padding: 8px 12px;
+                font-size: 13px;
+            }
+            .calendar-grid div {
+                padding: 8px;
+                font-size: 14px;
+            }
+            .day-name {
+                font-size: 11px;
+            }
+            .api-holiday:hover::after {
+                font-size: 10px;
+                padding: 5px 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calendar-container">
+        <div class="calendar-header">
+            <button onclick="prevMonth()">Prev</button>
+            <h2 id="month-year"></h2>
+            <button onclick="nextMonth()">Next</button>
+        </div>
+        <div class="calendar-grid" id="calendar">
+            <div class="day-name">Min</div>
+            <div class="day-name">Sen</div>
+            <div class="day-name">Sel</div>
+            <div class="day-name">Rab</div>
+            <div class="day-name">Kam</div>
+            <div class="day-name">Jum</div>
+            <div class="day-name">Sab</div>
+        </div>
+    </div>
+
+    <script>
+        let currentDate = new Date();
+        let currentMonth = currentDate.getMonth();
+        let currentYear = currentDate.getFullYear();
+        let holidays = [];
+
+        const monthNames = [
+            "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+            "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+        ];
+
+        async function fetchHolidays(month, year) {
+            try {
+                const response = await fetch(`https://kalender.robsan.my.id/api/hari-libur?tahun=${year}&bulan=${month + 1}`);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch holidays: ${response.status} ${response.statusText}`);
+                }
+                holidays = await response.json();
+                console.log(`Holidays for ${month + 1}/${year}:`, holidays);
+            } catch (error) {
+                console.error('Error fetching holidays:', error);
+                holidays = [];
+            }
+        }
+
+        async function renderCalendar(month, year) {
+            const calendar = document.getElementById("calendar");
+            const monthYear = document.getElementById("month-year");
+            monthYear.textContent = `${monthNames[month]} ${year}`;
+
+            await fetchHolidays(month, year);
+
+            while (calendar.children.length > 7) {
+                calendar.removeChild(calendar.lastChild);
+            }
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            for (let i = 0; i < firstDay; i++) {
+                const emptyDiv = document.createElement("div");
+                emptyDiv.className = "empty";
+                calendar.appendChild(emptyDiv);
+            }
+
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dayDiv = document.createElement("div");
+                dayDiv.className = "day";
+                dayDiv.textContent = i;
+
+                if (
+                    i === currentDate.getDate() &&
+                    month === currentDate.getMonth() &&
+                    year === currentDate.getFullYear()
+                ) {
+                    dayDiv.className += " current-day";
+                }
+
+                const currentDayOfWeek = new Date(year, month, i).getDay();
+                if (currentDayOfWeek === 0 || currentDayOfWeek === 6) {
+                    dayDiv.className += " holiday";
+                }
+
+                const formattedDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+                const holiday = holidays.find(h => h.tanggal === formattedDate);
+                if (holiday) {
+                    console.log(`Found holiday on ${formattedDate}: ${holiday.nama}`);
+                    dayDiv.className += " api-holiday";
+                    dayDiv.setAttribute("data-holiday-name", holiday.nama);
+                }
+
+                calendar.appendChild(dayDiv);
+            }
+        }
+
+        function prevMonth() {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            renderCalendar(currentMonth, currentYear);
+        }
+
+        function nextMonth() {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            renderCalendar(currentMonth, currentYear);
+        }
+
+        renderCalendar(currentMonth, currentYear);
+    </script>
+</body>
+</html>

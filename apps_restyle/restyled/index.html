@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apps · Robsan</title>
+  <meta name="description" content="A small collection of web tools built out of curiosity.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* ===== Playroom · light (terminal list) ===== */
+    :root {
+      --bg: #F4F1EA;
+      --bg-alt: #EFEBE1;
+      --surface: #FDFCF8;
+      --text: #1C1B22;
+      --muted: #6B6973;
+      --faint: #8B8993;
+      --divider: #E2DED2;
+      --indigo: #4D4DDB;
+      --coral: #E8603C;
+      --amber: #EFA63A;
+      --jade: #2E9E6B;
+      --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      --mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      min-height: 100vh;
+      padding: 0 20px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .wrap {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 60px 0 90px;
+    }
+
+    /* ---------- header ---------- */
+    .crumb {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .crumb b { color: var(--indigo); font-weight: 500; }
+    .crumb a { color: inherit; text-decoration: none; }
+    .crumb a:hover { color: var(--text); }
+
+    h1 {
+      font-weight: 800;
+      font-size: clamp(34px, 6vw, 52px);
+      line-height: 1.05;
+      letter-spacing: -0.035em;
+      margin-bottom: 14px;
+    }
+
+    .intro {
+      font-size: 16px;
+      color: var(--muted);
+      line-height: 1.6;
+      max-width: 620px;
+    }
+    .intro em { color: var(--text); font-style: italic; }
+
+    /* ---------- filter chips ---------- */
+    .filters {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 30px 0 22px;
+    }
+    .chip {
+      font-family: var(--mono);
+      font-size: 12.5px;
+      line-height: 1.4;
+      padding: 6px 14px;
+      border-radius: 99px;
+      border: 1px solid var(--divider);
+      background: var(--surface);
+      color: var(--muted);
+      cursor: pointer;
+      transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+    }
+    .chip:hover { border-color: var(--muted); color: var(--text); }
+    .chip.on {
+      background: var(--text);
+      color: var(--bg);
+      border-color: var(--text);
+    }
+    .chip .n { opacity: 0.6; margin-left: 5px; }
+
+    /* ---------- terminal window ---------- */
+    .term {
+      border: 1px solid var(--divider);
+      border-radius: 14px;
+      background: var(--surface);
+      overflow: hidden;
+    }
+    .term-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 13px 20px;
+      border-bottom: 1px solid var(--divider);
+      font-family: var(--mono);
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+    .term-head .dots { display: flex; gap: 6px; }
+    .term-head .dots i {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--divider);
+    }
+
+    /* ---------- rows ---------- */
+    .row {
+      display: grid;
+      grid-template-columns: 36px 180px auto 1fr auto;
+      gap: 14px;
+      align-items: center;
+      padding: 15px 20px;
+      border-bottom: 1px solid var(--divider);
+      text-decoration: none;
+      color: var(--text);
+      font-weight: 400;
+      transition: background 0.15s ease;
+    }
+    .row:last-child { border-bottom: none; }
+    .row:hover { background: var(--bg); }
+    .row .glyph { font-size: 21px; font-weight: 800; text-align: center; line-height: 1; }
+    .row .name { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+    .row .name .path {
+      display: block;
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--faint);
+      margin-top: 2px;
+    }
+    .row .tag {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.05em;
+      padding: 3px 8px;
+      border-radius: 99px;
+      border: 1px solid currentColor;
+      opacity: 0.75;
+      justify-self: start;
+    }
+    .row .desc { font-size: 13.5px; line-height: 1.5; color: var(--muted); }
+    .row .open {
+      font-family: var(--mono);
+      font-size: 12.5px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .row.c0 .glyph, .row.c0 .tag, .row.c0 .open { color: var(--indigo); }
+    .row.c1 .glyph, .row.c1 .tag, .row.c1 .open { color: var(--coral); }
+    .row.c2 .glyph, .row.c2 .tag, .row.c2 .open { color: var(--amber); }
+    .row.c3 .glyph, .row.c3 .tag, .row.c3 .open { color: var(--jade); }
+
+    /* ---------- footnote ---------- */
+    .footnote {
+      margin-top: 22px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .footnote .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--jade); }
+
+    /* ---------- narrow screens: stack the row ---------- */
+    @media (max-width: 720px) {
+      .row {
+        grid-template-columns: 36px 1fr auto;
+        grid-template-areas:
+          'glyph name tag'
+          'glyph desc desc'
+          'glyph open open';
+        row-gap: 6px;
+      }
+      .row .glyph { grid-area: glyph; align-self: start; margin-top: 2px; }
+      .row .name { grid-area: name; }
+      .row .tag { grid-area: tag; justify-self: end; }
+      .row .desc { grid-area: desc; }
+      .row .open { grid-area: open; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="crumb"><a href="https://jankerzone.com">~/jankerzone</a>/<b>apps</b></div>
+    <h1>Mini Apps &amp; Tools</h1>
+    <p class="intro">Small web apps built out of <em>curiosity, caffeine, and the love of tinkering</em>. Lightweight, fast, and made to make daily tasks a bit easier — sometimes more fun.</p>
+
+    <div class="filters" id="filters" role="tablist" aria-label="Filter apps by tag"></div>
+
+    <div class="term">
+      <div class="term-head">
+        <span class="dots"><i></i><i></i><i></i></span>
+        <span id="term-label">$ ls -la ~/apps</span>
+      </div>
+      <div id="rows"></div>
+    </div>
+
+    <div class="footnote"><span class="dot"></span>all apps are free, no accounts, no tracking</div>
+  </div>
+
+  <script>
+    // Single source of truth — mirrors the jankerzone.com /apps list.
+    const apps = [
+      { g: 'Bw', name: 'Brain War 2025',     path: '/brain-war',      tag: 'game',  desc: 'Nostalgic single-player quiz — 100 random questions to test your knowledge.', link: 'https://robsan.my.id/apps/brain-war' },
+      { g: '¤',  name: 'Currency Converter', path: '/converter',      tag: 'tool',  desc: 'Real-time exchange rates around the world.',                              link: 'https://robsan.my.id/apps/converter' },
+      { g: '31', name: 'Simple Calendar',    path: '/calendar',       tag: 'tool',  desc: 'National holidays, joint leave & important dates.',                       link: 'https://robsan.my.id/apps/calendar' },
+      { g: '?',  name: 'Decision Maker',     path: '/decision-maker', tag: 'fun',   desc: "Let the app decide when you can't.",                                      link: 'https://robsan.my.id/apps/decision-maker' },
+      { g: '{}', name: 'JSON → CSV',         path: '/json-csv',       tag: 'dev',   desc: 'Convert JSON to CSV with advanced options, plus a hub of dev utilities.', link: 'https://robsan.my.id/apps/json-csv' },
+      { g: '▣',  name: 'Box Manager',        path: '/pindahan',       tag: 'life',  desc: 'Document & organize boxes when moving house.',                            link: 'https://pindahan.jankerzone.com/' },
+      { g: 'Rp', name: 'Money Management',   path: '/tagihan',        tag: 'life',  desc: 'Bills & spending dashboard.',                                             link: 'https://tagihan.jankerzone.com/' },
+      { g: '⚙',  name: 'Servis Rutin',       path: '/servisrutin',    tag: 'life',  desc: 'Maintenance logs for your car, bike & gear.',                             link: 'https://servisrutin.jankerzone.com/' },
+      { g: '✂',  name: 'Cangcut Editor',     path: '/cangcut',        tag: 'video', desc: 'Lightweight web-based video editor, CapCut-inspired.',                    link: 'https://cangcut.jankerzone.com/' },
+    ];
+
+    const filtersEl = document.getElementById('filters');
+    const rowsEl = document.getElementById('rows');
+    const labelEl = document.getElementById('term-label');
+    let active = 'all';
+
+    // Color is tied to position in the master list, so it stays stable while filtering.
+    const colorOf = (a) => 'c' + (apps.indexOf(a) % 4);
+
+    function buildTags() {
+      const counts = {};
+      for (const a of apps) counts[a.tag] = (counts[a.tag] || 0) + 1;
+      return [['all', apps.length], ...Object.entries(counts)];
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+    }
+
+    function renderFilters() {
+      filtersEl.innerHTML = buildTags().map(([t, n]) =>
+        `<button class="chip${t === active ? ' on' : ''}" role="tab" aria-selected="${t === active}" data-tag="${t}">${t}<span class="n">${n}</span></button>`
+      ).join('');
+    }
+
+    function renderRows() {
+      const shown = active === 'all' ? apps : apps.filter(a => a.tag === active);
+      labelEl.textContent = `$ ls -la ~/apps · ${shown.length} item${shown.length === 1 ? '' : 's'}`;
+      rowsEl.innerHTML = shown.map(a => `
+        <a class="row ${colorOf(a)}" href="${a.link}" target="_blank" rel="noreferrer">
+          <span class="glyph">${escapeHtml(a.g)}</span>
+          <span class="name">${escapeHtml(a.name)}<span class="path">${escapeHtml(a.path)}</span></span>
+          <span class="tag">${escapeHtml(a.tag)}</span>
+          <span class="desc">${escapeHtml(a.desc)}</span>
+          <span class="open">open →</span>
+        </a>`).join('');
+    }
+
+    filtersEl.addEventListener('click', (e) => {
+      const btn = e.target.closest('.chip');
+      if (!btn) return;
+      active = btn.dataset.tag;
+      renderFilters();
+      renderRows();
+    });
+
+    renderFilters();
+    renderRows();
+  </script>
+</body>
+</html>
