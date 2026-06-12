@@ -1,48 +1,12 @@
+---
+title: Mini Apps & Tools
+aside: false
+---
+
+<div class="jz-crumb">~/jankerzone/<b>apps</b></div>
+
 # Mini Apps & Tools
 
-Welcome to my personal collection of small web apps — built out of curiosity, caffeine, and the love of tinkering with the web.
+Small web apps built out of *curiosity, caffeine, and the love of tinkering*. Lightweight, fast, and made to make daily tasks a bit easier — sometimes more fun.
 
-Each tool here is lightweight, fast, and designed to make daily tasks a bit easier (and sometimes more fun).
-
-## Brain War 2025
-A nostalgic single-player quiz game with 100 random questions to test your knowledge.
-[**Play Game →**](https://robsan.my.id/apps/brain-war)
-
-
-## Currency Converter
-Convert exchange rates from around the world with real-time data.
-[**Open App →**](https://robsan.my.id/apps/converter)
-
-
-## Simple Calendar
-Check national holidays, joint leave schedules, and other important dates.
-[**Open App →**](https://robsan.my.id/apps/calendar)
-
-
-## Decision Maker
-Let the app decide for you when you're feeling indecisive.
-[**Open App →**](https://robsan.my.id/apps/decision-maker)
-
-
-## JSON to CSV Converter
-Convert JSON data to CSV format with advanced options and other utility tools.
-[**Open App →**](https://robsan.my.id/apps/json-csv)
-
-
-## Box Management
-Moving house? Need help managing cardboard boxes so their contents are well-documented and neatly organized?
-[**Open App →**](https://pindahan.jankerzone.com/)
-
-
-## Money Management
-TagihanSerampangan is a app based management dashboard
-[**Open App →**](https://tagihan.jankerzone.com/)
-
-## Servis Rutin
-Track and log every maintenance history for your car, motorcycle, or electronics — so you never miss a service schedule again.
-[**Open App →**](https://servisrutin.jankerzone.com/)
-
-
-## Web Based Video Editor
-Cangcut is a forked version of a Lightweight Video Editor. Free for the web, desktop, and more, with features inspired by editors like CapCut.
-[**Open App →**](https://cangcut.jankerzone.com/)
+<AppList />
