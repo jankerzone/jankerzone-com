@@ -6,9 +6,7 @@ Each note is a work-in-progress, so expect things to evolve as I learn more.
 
 ## Recent Notes
 
-- [Building AI Experiments with VitePress](/notes/ai-experiments)
-- [Setting Up My Dev Environment](/notes/dev-setup)
-- [Why I Love Static Sites](/notes/static-sites)
+- [Bridging Planning and Budget: Building KRISNA ↔ SAKTI Sync](/notes/krisna-sakti-sync)
 
 ---
 
