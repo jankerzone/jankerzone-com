@@ -12,5 +12,5 @@ export const apps = [
   { g: '⚙', name: 'Servis Rutin', path: '/servisrutin', tag: 'life', desc: 'Maintenance logs for your car, bike & gear.', link: 'https://servisrutin.jankerzone.com/' },
   { g: '✂', name: 'Cangcut Editor', path: '/cangcut', tag: 'video', desc: 'Lightweight web-based video editor, CapCut-inspired.', link: 'https://cangcut.jankerzone.com/' },
   { g: '⧉', name: 'Image Hosting', path: '/img', tag: 'tool', desc: 'Copy, paste, done — instant image hosting.', link: 'https://img.robsan.my.id/' },
-  { g: 'M↓', name: 'mdown', path: '/mdown', tag: 'tool', desc: 'Paste images straight into Markdown.', link: 'http://mdown.my.id/' },
+  { g: 'M↓', name: 'mdown', path: '/mdown', tag: 'tool', desc: 'Share Markdown instantly — no account needed.', link: 'https://mdown.my.id/' },
 ]
