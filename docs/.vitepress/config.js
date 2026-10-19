@@ -32,6 +32,8 @@ export default {
                 text: "Web-based Video Editor",
                 link: "https://cangcut.jankerzone.com/",
               },
+              { text: "Image Hosting", link: "https://img.robsan.my.id/" },
+              { text: "mdown", link: "http://mdown.my.id/" },
             ],
           },
           { text: "Notes", link: "/notes" },
