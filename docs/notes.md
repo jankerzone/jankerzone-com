@@ -7,6 +7,8 @@ Each note is a work-in-progress, so expect things to evolve as I learn more.
 ## Recent Notes
 
 - [Punya Sekretaris Pribadi di Telegram: Setup Hermes Agent di VPS 35 Ribuan](/notes/setup-hermes-agent-telegram)
+- [From Slides to Pull Requests: How AI Changed My Work as a Systems Analyst](/notes/ai-era-systems-analyst)
+- [Bridging Planning and Budget: Building KRISNA ↔ SAKTI Sync](/notes/krisna-sakti-sync)
 
 ---
 
